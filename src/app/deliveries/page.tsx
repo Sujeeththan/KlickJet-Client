@@ -1,5 +1,9 @@
+import DeliveryListView from "@/sections/delivery/view/delivery-list-view";
+
 export default function DeliveriesListPage() {
     return (
-        <div></div>
+        <div>
+            <DeliveryListView />
+        </div>
     );
 }
