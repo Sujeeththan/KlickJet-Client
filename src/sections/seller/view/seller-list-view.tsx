@@ -35,9 +35,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
+import { getSellers } from "@/services/seller"
 
 
 
@@ -72,19 +72,26 @@ export const columns: ColumnDef<UserItem>[] = [
     ),
   },
   {
-    accessorKey: "username",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-         UserName
+         Name
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("username")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+  },
+  {
+    accessorKey: "shop_name",
+    header: "Shop Name",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("shop_name")}</div>
+    ),
   },
   {
     accessorKey: "email",
@@ -93,18 +100,32 @@ export const columns: ColumnDef<UserItem>[] = [
       <div className="capitalize">{row.getValue("email")}</div>
     ),
   },
-  {
+   {
+    accessorKey: "phone_no",
+    header: "Phone No",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("phone_no")}</div>
+    ),
+  },
+   {
+    accessorKey: "address",
+    header: "Address",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("address")}</div>
+    ),
+  },
+   {
+    accessorKey: "isVerified",
+    header: "Is Verified",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("isVerified")}</div>
+    ),
+  },
+   {
     accessorKey: "createdAt",
     header: "CreatedAt",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("createdAt")}</div>
-    ),
-  },
-   {
-    accessorKey: "updatedAt",
-    header: "UpdatedAt",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("updatedAt")}</div>
     ),
   },
   {
@@ -160,12 +181,12 @@ export default function SellerListView() {
   
 
   React.useEffect(() => {
-    fetchUsers();
+    fetchSellers();
   }, []);
 
-  const fetchUsers = async () => {
-    const users = await getUsers();
-    setData(users);
+  const fetchSellers = async () => {
+    const sellers = await getSellers();
+    setData(sellers);
   };
 
   const table = useReactTable({
