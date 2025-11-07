@@ -93,6 +93,20 @@ export const columns: ColumnDef<UserItem>[] = [
       <div className="capitalize">{row.getValue("email")}</div>
     ),
   },
+    {
+    accessorKey: "password",
+    header: "Password",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("password")}</div>
+    ),
+  },
+    {
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("role")}</div>
+    ),
+  },
   {
     accessorKey: "createdAt",
     header: "CreatedAt",
@@ -100,13 +114,7 @@ export const columns: ColumnDef<UserItem>[] = [
       <div className="capitalize">{row.getValue("createdAt")}</div>
     ),
   },
-   {
-    accessorKey: "updatedAt",
-    header: "UpdatedAt",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("updatedAt")}</div>
-    ),
-  },
+  
   {
     id: "actions",
     enableHiding: false,
