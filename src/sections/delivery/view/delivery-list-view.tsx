@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +12,11 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,13 +34,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { UserItem } from "@/types/user"
-import { getDeliveries } from "@/services/delivery"
+} from "@/components/ui/table";
+import { getDeliveries } from "@/services/delivery";
+import { DeliveryItem } from "@/types/delivery";
 
-
-
-export const columns: ColumnDef<UserItem>[] = [
+export const columns: ColumnDef<DeliveryItem>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -66,9 +64,7 @@ export const columns: ColumnDef<UserItem>[] = [
   {
     accessorKey: "_id",
     header: "Id",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("_id")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("_id")}</div>,
   },
   {
     accessorKey: "address",
@@ -78,12 +74,14 @@ export const columns: ColumnDef<UserItem>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-         Address
+          Address
           <ArrowUpDown />
         </Button>
-      )
+      );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("address")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("address")}</div>
+    ),
   },
   {
     accessorKey: "delivered_date",
@@ -99,21 +97,21 @@ export const columns: ColumnDef<UserItem>[] = [
       <div className="capitalize">{row.getValue("order_id")}</div>
     ),
   },
-   {
+  {
     accessorKey: "deliverer_id",
     header: "Deliverer Id",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("deliverer_id")}</div>
     ),
   },
-    {
+  {
     accessorKey: "status",
     header: "Status ",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("status")}</div>
     ),
   },
-     {
+  {
     accessorKey: "createdAt",
     header: "CreatedAt ",
     cell: ({ row }) => (
@@ -124,7 +122,7 @@ export const columns: ColumnDef<UserItem>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const delivery = row.original;
 
       return (
         <DropdownMenu>
@@ -137,40 +135,37 @@ export const columns: ColumnDef<UserItem>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(delivery._id)}
             >
               <Button>View</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(delivery._id)}
             >
               <Button>Edit</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(delivery._id)}
             >
               <Button variant="destructive">Delete</Button>
             </DropdownMenuItem>
-            
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
 
 export default function DeliveryListView() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
-  const [data, setData] = React.useState<UserItem[]>([]);
-
-  
+  const [data, setData] = React.useState<DeliveryItem[]>([]);
 
   React.useEffect(() => {
     fetchDeliveries();
@@ -198,7 +193,7 @@ export default function DeliveryListView() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
@@ -233,7 +228,7 @@ export default function DeliveryListView() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -253,7 +248,7 @@ export default function DeliveryListView() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -263,7 +258,7 @@ export default function DeliveryListView() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -313,8 +308,5 @@ export default function DeliveryListView() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-
-
