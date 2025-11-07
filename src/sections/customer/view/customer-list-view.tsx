@@ -35,7 +35,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
 import { getCustomers } from "@/services/customer"
