@@ -35,9 +35,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
-import { useRouter } from "next/router" 
+import { getDeliveries } from "@/services/delivery"
 
 
 
@@ -72,39 +71,53 @@ export const columns: ColumnDef<UserItem>[] = [
     ),
   },
   {
-    accessorKey: "username",
+    accessorKey: "address",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-         UserName
+         Address
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("username")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("address")}</div>,
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "delivered_date",
+    header: "Delivered Date",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("email")}</div>
+      <div className="capitalize">{row.getValue("delivered_date")}</div>
     ),
   },
   {
-    accessorKey: "createdAt",
-    header: "CreatedAt",
+    accessorKey: "order_id",
+    header: "Order Id",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("createdAt")}</div>
+      <div className="capitalize">{row.getValue("order_id")}</div>
     ),
   },
    {
-    accessorKey: "updatedAt",
-    header: "UpdatedAt",
+    accessorKey: "deliverer_id",
+    header: "Deliverer Id",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("updatedAt")}</div>
+      <div className="capitalize">{row.getValue("deliverer_id")}</div>
+    ),
+  },
+    {
+    accessorKey: "status",
+    header: "Status ",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("status")}</div>
+    ),
+  },
+     {
+    accessorKey: "createdAt",
+    header: "CreatedAt ",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("createdAt")}</div>
     ),
   },
   {
@@ -160,12 +173,12 @@ export default function DeliveryListView() {
   
 
   React.useEffect(() => {
-    fetchUsers();
+    fetchDeliveries();
   }, []);
 
-  const fetchUsers = async () => {
-    const users = await getUsers();
-    setData(users);
+  const fetchDeliveries = async () => {
+    const deliveries = await getDeliveries();
+    setData(deliveries);
   };
 
   const table = useReactTable({
@@ -191,10 +204,10 @@ export default function DeliveryListView() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter Address"
+          value={(table.getColumn("address")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("address")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

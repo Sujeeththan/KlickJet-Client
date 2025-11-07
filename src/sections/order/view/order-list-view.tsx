@@ -38,6 +38,7 @@ import {
 import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
+import { getOrders } from "@/services/order"
 
 
 
@@ -72,39 +73,60 @@ export const columns: ColumnDef<UserItem>[] = [
     ),
   },
   {
-    accessorKey: "username",
+    accessorKey: "total_amount",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-         UserName
+         Total Amount
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("username")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("total_amount")}</div>,
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "order_date",
+    header: "Order Date",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("email")}</div>
+      <div className="capitalize">{row.getValue("order_date")}</div>
     ),
   },
   {
-    accessorKey: "createdAt",
-    header: "CreatedAt",
+    accessorKey: "status",
+    header: "Status",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("createdAt")}</div>
+      <div className="capitalize">{row.getValue("status")}</div>
     ),
   },
    {
-    accessorKey: "updatedAt",
-    header: "UpdatedAt",
+    accessorKey: "customer_id",
+    header: "Customer Id",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("updatedAt")}</div>
+      <div className="capitalize">{row.getValue("customer_id")}</div>
+    ),
+  },
+    {
+    accessorKey: "product_id",
+    header: "Product Id",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("product_id")}</div>
+    ),
+  },
+   {
+    accessorKey: "quantity",
+    header: "Quantity ",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("quantity")}</div>
+    ),
+  },
+   {
+    accessorKey: "createdAt",
+    header: "CreatedAt ",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("createdAt")}</div>
     ),
   },
   {
@@ -160,12 +182,12 @@ export default function OrderListView() {
   
 
   React.useEffect(() => {
-    fetchUsers();
+    fetchOrders();
   }, []);
 
-  const fetchUsers = async () => {
-    const users = await getUsers();
-    setData(users);
+  const fetchOrders = async () => {
+    const orders = await getOrders();
+    setData(orders);
   };
 
   const table = useReactTable({
