@@ -37,7 +37,9 @@ import {
 } from "@/components/ui/table"
 import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
+
 import { useRouter } from "next/router" 
+import { getDeliverer } from "@/services/deliverer"
 
 
 
@@ -72,39 +74,60 @@ export const columns: ColumnDef<UserItem>[] = [
     ),
   },
   {
-    accessorKey: "username",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-         UserName
+         Name
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("username")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
   },
   {
+    accessorKey: "phone_no",
+    header: "Phone Number",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("phone_no")}</div>
+    ),
+  },
+   {
     accessorKey: "email",
     header: "Email",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("email")}</div>
     ),
   },
+     {
+    accessorKey: "vehicle_no",
+    header: "Vehicle No",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("vehicle_no")}</div>
+    ),
+  },
+     {
+    accessorKey: "vehicle_type",
+    header: "Vehicle Type",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("vehicle_type")}</div>
+    ),
+  },
   {
+    accessorKey: "address",
+    header: "Address",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("address")}</div>
+    ),
+  },
+   {
     accessorKey: "createdAt",
     header: "CreatedAt",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("createdAt")}</div>
-    ),
-  },
-   {
-    accessorKey: "updatedAt",
-    header: "UpdatedAt",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("updatedAt")}</div>
     ),
   },
   {
@@ -160,11 +183,11 @@ export default function DelivererListView() {
   
 
   React.useEffect(() => {
-    fetchUsers();
+    fetchDeliverer();
   }, []);
 
-  const fetchUsers = async () => {
-    const users = await getUsers();
+  const fetchDeliverer = async () => {
+    const users = await getDeliverer();
     setData(users);
   };
 
