@@ -35,9 +35,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
+import { getProduct } from "@/services/product"
 
 
 
@@ -72,35 +72,49 @@ export const columns: ColumnDef<UserItem>[] = [
     ),
   },
   {
-    accessorKey: "username",
+    accessorKey: "name",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-         UserName
+         Name
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("username")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "price",
+    header: "Price",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("email")}</div>
+      <div className="capitalize">{row.getValue("price")}</div>
     ),
   },
   {
+    accessorKey: "instock",
+    header: "Instock",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("instock")}</div>
+    ),
+  },
+   {
+    accessorKey: "discount",
+    header: "Discount",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("discount")}</div>
+    ),
+  },
+   {
     accessorKey: "createdAt",
     header: "CreatedAt",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("createdAt")}</div>
     ),
   },
-   {
+     {
     accessorKey: "updatedAt",
     header: "UpdatedAt",
     cell: ({ row }) => (
@@ -160,12 +174,12 @@ export default function ProductListView() {
   
 
   React.useEffect(() => {
-    fetchUsers();
+    fetchProducts();
   }, []);
 
-  const fetchUsers = async () => {
-    const users = await getUsers();
-    setData(users);
+  const fetchProducts = async () => {
+    const products = await getProduct();
+    setData(products);
   };
 
   const table = useReactTable({
