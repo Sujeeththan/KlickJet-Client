@@ -38,6 +38,7 @@ import {
 import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
+import { getCustomers } from "@/services/customer"
 
 
 
@@ -65,32 +66,60 @@ export const columns: ColumnDef<UserItem>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "_id",
-    header: "Id",
+    accessorKey: "name",
+    header: "Name",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("_id")}</div>
+      <div className="capitalize">{row.getValue("name")}</div>
     ),
   },
-  {
-    accessorKey: "username",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-         UserName
-          <ArrowUpDown />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("username")}</div>,
-  },
+ 
   {
     accessorKey: "email",
     header: "Email",
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("email")}</div>
+    ),
+  },
+    {
+    accessorKey: "phone_no",
+    header: "Phone Number",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("phone_no")}</div>
+    ),
+  },
+    {
+    accessorKey: "address",
+    header: "Address",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("address")}</div>
+    ),
+  },
+    {
+    accessorKey: "isActive",
+    header: "IsActive",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("isActive")}</div>
+    ),
+  },
+   {
+    accessorKey: "deletedAt",
+    header: "DeletedAt",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("deletedAt")}</div>
+    ),
+  },
+    {
+    accessorKey: "createdBy",
+    header: "CreatedBy",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("createdBy")}</div>
+    ),
+  },
+    {
+    accessorKey: "updatedBy",
+    header: "UpdatedBy",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("updatedBy")}</div>
     ),
   },
   {
@@ -100,13 +129,7 @@ export const columns: ColumnDef<UserItem>[] = [
       <div className="capitalize">{row.getValue("createdAt")}</div>
     ),
   },
-   {
-    accessorKey: "updatedAt",
-    header: "UpdatedAt",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("updatedAt")}</div>
-    ),
-  },
+
   {
     id: "actions",
     enableHiding: false,
@@ -160,12 +183,12 @@ export default function CustomerListView() {
   
 
   React.useEffect(() => {
-    fetchUsers();
+    fetchCustomers();
   }, []);
 
-  const fetchUsers = async () => {
-    const users = await getUsers();
-    setData(users);
+  const fetchCustomers = async () => {
+    const customer = await getCustomers();
+    setData(customer);
   };
 
   const table = useReactTable({
