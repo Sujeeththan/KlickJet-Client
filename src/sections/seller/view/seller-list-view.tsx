@@ -35,13 +35,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
 import { getSellers } from "@/services/seller"
+import { SellerItem } from "@/types/seller"
 
 
 
-export const columns: ColumnDef<UserItem>[] = [
+export const columns: ColumnDef<SellerItem>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -132,7 +132,7 @@ export const columns: ColumnDef<UserItem>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const seller = row.original
 
       return (
         <DropdownMenu>
@@ -145,17 +145,17 @@ export const columns: ColumnDef<UserItem>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(seller._id)}
             >
               <Button>View</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(seller._id)}
             >
               <Button>Edit</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(seller._id)}
             >
               <Button variant="destructive">Delete</Button>
             </DropdownMenuItem>
@@ -176,7 +176,7 @@ export default function SellerListView() {
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  const [data, setData] = React.useState<UserItem[]>([]);
+  const [data, setData] = React.useState<SellerItem[]>([]);
 
   
 
