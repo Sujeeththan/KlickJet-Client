@@ -35,14 +35,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getUsers } from "@/services/user"
-import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
 import { getPayments } from "@/services/payment"
+import { PaymentItem } from "@/types/payment"
 
 
 
-export const columns: ColumnDef<UserItem>[] = [
+export const columns: ColumnDef<PaymentItem>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -106,7 +105,7 @@ export const columns: ColumnDef<UserItem>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const payment = row.original
 
       return (
         <DropdownMenu>
@@ -119,17 +118,17 @@ export const columns: ColumnDef<UserItem>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(payment._id)}
             >
               <Button>View</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(payment._id)}
             >
               <Button>Edit</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(payment._id)}
             >
               <Button variant="destructive">Delete</Button>
             </DropdownMenuItem>
@@ -150,7 +149,7 @@ export default function PaymentListView() {
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  const [data, setData] = React.useState<UserItem[]>([]);
+  const [data, setData] = React.useState<PaymentItem[]>([]);
 
   
 
