@@ -38,6 +38,7 @@ import {
 import { getUsers } from "@/services/user"
 import { UserItem } from "@/types/user"
 import { useRouter } from "next/router" 
+import { getPayments } from "@/services/payment"
 
 
 
@@ -72,41 +73,35 @@ export const columns: ColumnDef<UserItem>[] = [
     ),
   },
   {
-    accessorKey: "username",
+    accessorKey: "customer_id",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-         UserName
+         Customer Id
           <ArrowUpDown />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("username")}</div>,
+    cell: ({ row }) => <div className="lowercase">{row.getValue("customer_id")}</div>,
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "payment_method",
+    header: "Payment Method",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("email")}</div>
+      <div className="capitalize">{row.getValue("payment_method")}</div>
     ),
   },
   {
-    accessorKey: "createdAt",
-    header: "CreatedAt",
+    accessorKey: "order_id",
+    header: "Order Id",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("createdAt")}</div>
+      <div className="capitalize">{row.getValue("order_id")}</div>
     ),
   },
-   {
-    accessorKey: "updatedAt",
-    header: "UpdatedAt",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("updatedAt")}</div>
-    ),
-  },
+  
   {
     id: "actions",
     enableHiding: false,
@@ -160,12 +155,12 @@ export default function PaymentListView() {
   
 
   React.useEffect(() => {
-    fetchUsers();
+    fetchPayments();
   }, []);
 
-  const fetchUsers = async () => {
-    const users = await getUsers();
-    setData(users);
+  const fetchPayments = async () => {
+    const payments = await getPayments();
+    setData(payments);
   };
 
   const table = useReactTable({
