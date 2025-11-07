@@ -35,15 +35,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getUsers } from "@/services/user"
-import { UserItem } from "@/types/user"
-
 import { useRouter } from "next/router" 
-import { getDeliverer } from "@/services/deliverer"
+import { DelivererItem } from "@/types/deliverer"
+import { getDeliverers } from "@/services/deliverer"
 
 
 
-export const columns: ColumnDef<UserItem>[] = [
+export const columns: ColumnDef<DelivererItem>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -134,7 +132,7 @@ export const columns: ColumnDef<UserItem>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const user = row.original
+      const deliverer = row.original
 
       return (
         <DropdownMenu>
@@ -147,17 +145,17 @@ export const columns: ColumnDef<UserItem>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(deliverer._id)}
             >
               <Button>View</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(deliverer._id)}
             >
               <Button>Edit</Button>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user._id)}
+              onClick={() => navigator.clipboard.writeText(deliverer._id)}
             >
               <Button variant="destructive">Delete</Button>
             </DropdownMenuItem>
@@ -178,7 +176,7 @@ export default function DelivererListView() {
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  const [data, setData] = React.useState<UserItem[]>([]);
+  const [data, setData] = React.useState<DelivererItem[]>([]);
 
   
 
@@ -187,8 +185,8 @@ export default function DelivererListView() {
   }, []);
 
   const fetchDeliverer = async () => {
-    const users = await getDeliverer();
-    setData(users);
+    const deliverer = await getDeliverers();
+    setData(deliverer);
   };
 
   const table = useReactTable({
