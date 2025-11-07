@@ -5,4 +5,5 @@ export type UserItem = {
   password: string;
   role: "admin" | "cashier";
   createdAt: Date;
+  updatedAt: Date;
 };
