@@ -1,7 +1,8 @@
 export type UserItem = {
   _id: string;
-  name: string;
+  username: string;
   email: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+  password: string;
+  role: "admin" | "cashier";
+  createdAt: Date;
+};
