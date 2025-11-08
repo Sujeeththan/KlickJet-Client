@@ -5,6 +5,8 @@ const API_URL = "https://klick-jet-api.vercel.app/api/users"
 export const getUsers = async () => {
     console.log(API_URL);
     const res = await axios .get(API_URL)
+    console.log(res);
+    
     return res.data.users
     
 }
