@@ -24,10 +24,11 @@ import {
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  fullname: z
+  shopname: z
     .string()
-    .min(3, "Fullname is request")
-    .regex(/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/),
+  .min(3, "Shop name is request")
+  .max(100, "Shop name is too long"),
+
   email: z
     .string()
     .min(10, "Email is request")
@@ -36,14 +37,7 @@ const formSchema = z.object({
       "Please enter a valid email address"
     ),
 
-  phone: z
-    .string()
-    .min(10, "Phone number is request")
-    .regex(/^[0-9]+$/, "Phone number must contain only numbers"),
-  address: z
-    .string()
-    .min(5, "Address is request")
-    .max(200, "Address is too long"),
+ 
   password: z
     .string()
     .min(8, "Password is request")
@@ -57,10 +51,8 @@ export function FormRhfInput() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullname: "",
+      shopname: "",
       email: "",
-      phone: "",
-      address: "",
       password: "",
     },
   });
@@ -94,19 +86,19 @@ export function FormRhfInput() {
         <form id="form-rhf-input" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
-              name="fullname"
+              name="shopname"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-fullname">
-                    Full Name
+                  <FieldLabel htmlFor="form-rhf-input-shopname">
+                    Shop Name
                   </FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-input-fullname"
+                    id="form-rhf-input-shopname"
                     aria-invalid={fieldState.invalid}
                     placeholder=""
-                    autoComplete="fullname"
+                    autoComplete="shopname"
                   />
 
                   {fieldState.invalid && (
@@ -137,47 +129,7 @@ export function FormRhfInput() {
               )}
             />
 
-            <Controller
-              name="phone"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-phone">Phone</FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-rhf-input-phone"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="+1234567890"
-                    autoComplete="phone"
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="address"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-address">Address</FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-rhf-input-address"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="123 Main St, City, Country "
-                    autoComplete="address"
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+           
 
             <Controller
               name="password"
@@ -207,7 +159,7 @@ export function FormRhfInput() {
       <CardFooter>
         <Field orientation="horizontal">
           <Button type="submit" form="form-rhf-input">
-            Sign Up
+            Register as Seller
           </Button>
           <CardDescription>Already have an account? Login</CardDescription>
         </Field>

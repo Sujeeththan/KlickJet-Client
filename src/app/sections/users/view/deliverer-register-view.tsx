@@ -36,14 +36,16 @@ const formSchema = z.object({
       "Please enter a valid email address"
     ),
 
-  phone: z
+  licenseNumber: z
+   .string()
+  .min(5, "License number is request")
+  .max(20, "License number is too long"),
+  nic: z
     .string()
-    .min(10, "Phone number is request")
-    .regex(/^[0-9]+$/, "Phone number must contain only numbers"),
-  address: z
-    .string()
-    .min(5, "Address is request")
-    .max(200, "Address is too long"),
+    .regex(
+  /^([0-9]{9}[VvXx]|[0-9]{12})$/,
+  "Enter a valid Sri Lankan NIC number"
+),
   password: z
     .string()
     .min(8, "Password is request")
@@ -59,8 +61,8 @@ export function FormRhfInput() {
     defaultValues: {
       fullname: "",
       email: "",
-      phone: "",
-      address: "",
+      licenseNumber: "",
+      nic: "",
       password: "",
     },
   });
@@ -87,8 +89,8 @@ export function FormRhfInput() {
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
-        <CardDescription>Sign up as a customer</CardDescription>
+        <CardTitle>Join as Deliverer</CardTitle>
+        <CardDescription>Register to become a delivery agent. Approval required from admin.</CardDescription>
       </CardHeader>
       <CardContent>
         <form id="form-rhf-input" onSubmit={form.handleSubmit(onSubmit)}>
@@ -126,7 +128,7 @@ export function FormRhfInput() {
                     {...field}
                     id="form-rhf-input-email"
                     aria-invalid={fieldState.invalid}
-                    placeholder="you@example.com"
+                    placeholder=""
                     autoComplete="email"
                   />
 
@@ -138,17 +140,17 @@ export function FormRhfInput() {
             />
 
             <Controller
-              name="phone"
+              name="licenseNumber"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-phone">Phone</FieldLabel>
+                  <FieldLabel htmlFor="form-rhf-input-licenseNumber">License Number</FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-input-phone"
+                    id="form-rhf-input-licenseNumber"
                     aria-invalid={fieldState.invalid}
-                    placeholder="+1234567890"
-                    autoComplete="phone"
+                    placeholder=""
+                    autoComplete="licenseNumber"
                   />
 
                   {fieldState.invalid && (
@@ -159,17 +161,17 @@ export function FormRhfInput() {
             />
 
             <Controller
-              name="address"
+              name="nic"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-address">Address</FieldLabel>
+                  <FieldLabel htmlFor="form-rhf-input-nic">NIC</FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-input-address"
+                    id="form-rhf-input-nic"
                     aria-invalid={fieldState.invalid}
-                    placeholder="123 Main St, City, Country "
-                    autoComplete="address"
+                    placeholder=""
+                    autoComplete="nic"
                   />
 
                   {fieldState.invalid && (
@@ -207,7 +209,7 @@ export function FormRhfInput() {
       <CardFooter>
         <Field orientation="horizontal">
           <Button type="submit" form="form-rhf-input">
-            Sign Up
+            Register as Deliverer
           </Button>
           <CardDescription>Already have an account? Login</CardDescription>
         </Field>
