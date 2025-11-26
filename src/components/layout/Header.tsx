@@ -20,12 +20,12 @@ export function Header() {
           <Image
             src="/logo.png"
             alt="KlickJet Logo"
-            width={32}
-            height={32}
-            className="h-8 w-8 object-contain"
+            width={500}
+            height={500}
+            className="h-25 w-30 object-contain"
             priority
           />
-          <span className="text-xl font-semibold text-gray-900">Online Store</span>
+          
         </Link>
 
         {/* Navigation */}
