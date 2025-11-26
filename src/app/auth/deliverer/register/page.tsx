@@ -29,6 +29,11 @@ const formSchema = z.object({
     .string()
     .min(3, "Fullname is required")
     .regex(/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/, "Invalid name format"),
+  phone_no: z
+    .string()
+    .trim()
+    .min(10, "Phone number is required")
+    .regex(/^[0-9+\-\s()]+$/, "Enter a valid phone number"),
   email: z
     .string()
     .min(1, "Email is required"),
@@ -60,6 +65,7 @@ export default function DelivererRegisterPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullname: "",
+      phone_no: "",
       email: "",
       licenseNumber: "",
       nic: "",
@@ -70,9 +76,11 @@ export default function DelivererRegisterPage() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
       await register({
-        ...data,
+        email: data.email,
+        password: data.password,
         role: "deliverer",
         name: data.fullname,
+        phone_no: data.phone_no,
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -102,6 +110,29 @@ export default function DelivererRegisterPage() {
                     aria-invalid={fieldState.invalid}
                     placeholder=""
                     autoComplete="name"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="phone_no"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="phone_no">
+                    Phone Number
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="phone_no"
+                    aria-invalid={fieldState.invalid}
+                    placeholder=""
+                    autoComplete="tel"
+                    type="tel"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
