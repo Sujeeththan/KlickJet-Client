@@ -24,18 +24,35 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-const formSchema = z.object({
+export const formSchema = z.object({
   shopname: z
     .string()
+    .trim()
     .min(3, "Shop name is required")
     .max(100, "Shop name is too long"),
+
+  phone_no: z
+    .string()
+    .trim()
+    .min(10, "Phone number is required")
+    .regex(/^[0-9+\-\s()]+$/, "Enter a valid phone number"),
+
+  address: z
+    .string()
+    .min(5, "Address is required")
+    .max(200, "Address is too long"),
+
   email: z
     .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
+    .trim()
+    .min(8, "Email is required")
+    .max(100, "Email is too long")
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Enter a valid email address"),
+
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
+    .trim()
+    .min(8, "Password is required")
     .regex(
       /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
       "Password must contain uppercase, lowercase, number and special character"
@@ -49,6 +66,8 @@ export default function SellerRegisterPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       shopname: "",
+      phone_no: "",
+      address: "",
       email: "",
       password: "",
     },
@@ -57,9 +76,13 @@ export default function SellerRegisterPage() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
       await register({
-        ...data,
+        email: data.email,
+        password: data.password,
         role: "seller",
-        name: data.shopname, // Using shopname as name for now
+        name: data.shopname, // User's name (using shop name for now)
+        shopName: data.shopname, // Shop name for sellers
+        phone_no: data.phone_no, // Phone number for sellers
+        address: data.address, // Address for sellers
       });
     } catch (error) {
       console.error("Registration error:", error);
@@ -89,6 +112,51 @@ export default function SellerRegisterPage() {
                     aria-invalid={fieldState.invalid}
                     placeholder=""
                     autoComplete="organization"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="phone_no"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="phone_no">
+                    Phone Number
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="phone_no"
+                    aria-invalid={fieldState.invalid}
+                    placeholder=""
+                    autoComplete="tel"
+                    type="tel"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="address"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="address">
+                    Address
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="address"
+                    aria-invalid={fieldState.invalid}
+                    placeholder=""
+                    autoComplete="street-address"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
