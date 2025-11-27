@@ -2,7 +2,16 @@
 
 import { Sidebar, MobileSidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
-import { LayoutDashboard, Users, CheckSquare, Settings } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  Users, 
+  ShoppingBag, 
+  Truck, 
+  ListTree, 
+  Package, 
+  ShoppingCart, 
+  BarChart3 
+} from "lucide-react";
 
 const adminLinks = [
   {
@@ -11,19 +20,39 @@ const adminLinks = [
     icon: LayoutDashboard,
   },
   {
-    title: "Approvals",
-    href: "/admin/approvals",
-    icon: CheckSquare,
-  },
-  {
     title: "Users",
     href: "/admin/users",
     icon: Users,
   },
   {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
+    title: "Sellers",
+    href: "/admin/sellers",
+    icon: ShoppingBag, // Using ShoppingBag as a proxy for Sellers icon if specific one not available
+  },
+  {
+    title: "Deliverers",
+    href: "/admin/deliverers",
+    icon: Truck,
+  },
+  {
+    title: "Categories",
+    href: "/admin/categories",
+    icon: ListTree,
+  },
+  {
+    title: "Products",
+    href: "/admin/products",
+    icon: Package,
+  },
+  {
+    title: "Orders",
+    href: "/admin/orders",
+    icon: ShoppingCart,
+  },
+  {
+    title: "Analytics",
+    href: "/admin/analytics",
+    icon: BarChart3,
   },
 ];
 
