@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,6 +12,11 @@ import { RegisterDelivererModal } from "@/components/auth/RegisterDelivererModal
 
 export function Header() {
   const { user, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -59,12 +65,16 @@ export function Header() {
             </>
           ) : (
             <>
-              <RegisterSellerModal />
-              <RegisterDelivererModal />
-              <div className="flex items-center gap-3 ml-2">
-                <RegisterCustomerModal />
-                <LoginModal />
-              </div>
+              {mounted && (
+                <>
+                  <RegisterSellerModal />
+                  <RegisterDelivererModal />
+                  <div className="flex items-center gap-3 ml-2">
+                    <RegisterCustomerModal />
+                    <LoginModal />
+                  </div>
+                </>
+              )}
             </>
           )}
         </nav>

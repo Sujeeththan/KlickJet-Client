@@ -133,6 +133,13 @@ export const adminApi = {
     return handleResponse<{ success: boolean; sellers: any[] }>(response);
   },
 
+  async getAllSellers(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/sellers`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; sellers: any[] }>(response);
+  },
+
   async approveSeller(token: string, id: string) {
     const response = await fetch(`${API_BASE_URL}/api/admin/sellers/${id}/approve`, {
       method: 'PUT',
@@ -141,9 +148,21 @@ export const adminApi = {
     return handleResponse<{ success: boolean; message: string }>(response);
   },
 
-  async rejectSeller(token: string, id: string) {
+  async rejectSeller(token: string, id: string, rejectionReason: string) {
     const response = await fetch(`${API_BASE_URL}/api/admin/sellers/${id}/reject`, {
       method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ rejectionReason }),
+    });
+    return handleResponse<{ success: boolean; message: string }>(response);
+  },
+
+  async deleteSeller(token: string, id: string) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/sellers/${id}`, {
+      method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; message: string }>(response);
@@ -151,6 +170,13 @@ export const adminApi = {
 
   async getPendingDeliverers(token: string) {
     const response = await fetch(`${API_BASE_URL}/api/admin/deliverers/pending`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; deliverers: any[] }>(response);
+  },
+
+  async getAllDeliverers(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/deliverers`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; deliverers: any[] }>(response);
@@ -164,26 +190,31 @@ export const adminApi = {
     return handleResponse<{ success: boolean; message: string }>(response);
   },
 
-  async rejectDeliverer(token: string, id: string) {
+  async rejectDeliverer(token: string, id: string, rejectionReason: string) {
     const response = await fetch(`${API_BASE_URL}/api/admin/deliverers/${id}/reject`, {
       method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ rejectionReason }),
+    });
+    return handleResponse<{ success: boolean; message: string }>(response);
+  },
+
+  async deleteDeliverer(token: string, id: string) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/deliverers/${id}`, {
+      method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; message: string }>(response);
   },
 
-  async getAllSellers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/sellers`, {
+  async getAllUsers(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return handleResponse<{ success: boolean; sellers: any[] }>(response);
-  },
-
-  async getAllDeliverers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/deliverers`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; deliverers: any[] }>(response);
+    return handleResponse<{ success: boolean; users: any[]; count: number }>(response);
   },
 
   async deleteUser(token: string, id: string) {
