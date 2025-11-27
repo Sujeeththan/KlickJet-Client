@@ -171,6 +171,28 @@ export const adminApi = {
     });
     return handleResponse<{ success: boolean; message: string }>(response);
   },
+
+  async getAllSellers(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/sellers`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; sellers: any[] }>(response);
+  },
+
+  async getAllDeliverers(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/deliverers`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; deliverers: any[] }>(response);
+  },
+
+  async deleteUser(token: string, id: string) {
+    const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; message: string }>(response);
+  },
 };
 
 export { ApiError };
