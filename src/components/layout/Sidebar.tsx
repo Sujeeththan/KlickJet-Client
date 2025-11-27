@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/types/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -26,7 +26,9 @@ export function Sidebar({ className, links }: SidebarProps) {
       <div className="space-y-4 py-4 flex-1">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : "Dashboard"}
+            {user?.role
+              ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
+              : "Dashboard"}
           </h2>
           <div className="space-y-1">
             {links.map((link) => (
@@ -45,7 +47,7 @@ export function Sidebar({ className, links }: SidebarProps) {
           </div>
         </div>
       </div>
-      
+
       {/* User Profile & Logout Section */}
       <div className="mt-auto px-3 py-4 border-t">
         <div className="px-4 py-2 mb-2">
@@ -53,8 +55,8 @@ export function Sidebar({ className, links }: SidebarProps) {
             {user?.email || "admin@gmail.com"}
           </p>
         </div>
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
           onClick={logout}
         >
@@ -85,7 +87,10 @@ export function MobileSidebar({ links }: SidebarProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden">
+        <Button
+          variant="ghost"
+          className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+        >
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle Menu</span>
         </Button>

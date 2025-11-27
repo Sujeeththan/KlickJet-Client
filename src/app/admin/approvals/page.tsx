@@ -21,7 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { adminApi } from "@/lib/api";
+import { adminApi } from "@/types/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Mock data - replace with API call
@@ -59,10 +59,16 @@ export default function ApprovalsPage() {
           adminApi.getPendingSellers(token),
           adminApi.getPendingDeliverers(token),
         ]);
-        
-        const sellers = sellersRes.sellers.map((s: any) => ({ ...s, role: "seller" }));
-        const deliverers = deliverersRes.deliverers.map((d: any) => ({ ...d, role: "deliverer" }));
-        
+
+        const sellers = sellersRes.sellers.map((s: any) => ({
+          ...s,
+          role: "seller",
+        }));
+        const deliverers = deliverersRes.deliverers.map((d: any) => ({
+          ...d,
+          role: "deliverer",
+        }));
+
         setUsers([...sellers, ...deliverers]);
       } catch (error) {
         toast.error("Failed to fetch pending approvals");
@@ -157,11 +163,17 @@ export default function ApprovalsPage() {
                       <DialogHeader>
                         <DialogTitle>Approve Registration</DialogTitle>
                         <DialogDescription>
-                          Are you sure you want to approve {user.name} as a {user.role}?
+                          Are you sure you want to approve {user.name} as a{" "}
+                          {user.role}?
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
-                        <Button variant="outline" onClick={() => setSelectedUser(null)}>Cancel</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setSelectedUser(null)}
+                        >
+                          Cancel
+                        </Button>
                         <Button onClick={confirmAction}>Confirm Approve</Button>
                       </DialogFooter>
                     </DialogContent>
@@ -181,12 +193,20 @@ export default function ApprovalsPage() {
                       <DialogHeader>
                         <DialogTitle>Reject Registration</DialogTitle>
                         <DialogDescription>
-                          Are you sure you want to reject {user.name}? This action cannot be undone.
+                          Are you sure you want to reject {user.name}? This
+                          action cannot be undone.
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
-                        <Button variant="outline" onClick={() => setSelectedUser(null)}>Cancel</Button>
-                        <Button variant="destructive" onClick={confirmAction}>Confirm Reject</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setSelectedUser(null)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={confirmAction}>
+                          Confirm Reject
+                        </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>

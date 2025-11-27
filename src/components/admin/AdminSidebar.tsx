@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Store, 
-  Truck, 
-  Layers, 
-  Package, 
-  ShoppingCart, 
-  BarChart3, 
-  LogOut 
+import {
+  LayoutDashboard,
+  Users,
+  Store,
+  Truck,
+  Layers,
+  Package,
+  ShoppingCart,
+  BarChart3,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,7 +36,7 @@ export function AdminSidebar() {
       <div className="p-6 border-b border-gray-200">
         <h1 className="text-xl font-bold">Online Store</h1>
       </div>
-      
+
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1 px-3">
           {sidebarItems.map((item) => {
