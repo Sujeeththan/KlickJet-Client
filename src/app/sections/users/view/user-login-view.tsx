@@ -25,9 +25,10 @@ import {
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  email: z.string().min(1, "Email is required"),
+  email: z.string().min(2, "Email is required").regex(/ /),
   password: z
     .string()
+    .min(8,"Password is requerd")
     .min(8, "Password must be at least 8 characters")
     .regex(
       /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
