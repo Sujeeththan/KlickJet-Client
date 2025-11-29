@@ -28,7 +28,7 @@ const formSchema = z.object({
   email: z
     .string()
     .trim()
-    .min(20, "Email is required")
+    .min(2, "Email is required")
     .regex(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Invalid email address")
     .toLowerCase(),
 
