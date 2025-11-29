@@ -226,4 +226,91 @@ export const adminApi = {
   },
 };
 
+export const sellerApi = {
+  async getSellerProducts(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/products`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; products: any[] }>(response);
+  },
+
+  async createProduct(token: string, productData: FormData) {
+    const response = await fetch(`${API_BASE_URL}/api/products`, {
+      method: 'POST',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+      },
+      body: productData,
+    });
+    return handleResponse<{ success: boolean; message: string; product: any }>(response);
+  },
+
+  async updateProduct(token: string, id: string, productData: FormData) {
+    const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+      method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+      },
+      body: productData,
+    });
+    return handleResponse<{ success: boolean; message: string; product: any }>(response);
+  },
+
+  async deleteProduct(token: string, id: string) {
+    const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; message: string }>(response);
+  },
+
+  async getSellerOrders(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/orders`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; orders: any[] }>(response);
+  },
+
+  async getOrderById(token: string, id: string) {
+    const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ success: boolean; order: any }>(response);
+  },
+
+  async updateOrderStatus(token: string, id: string, status: string) {
+    const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+      method: 'PUT',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    });
+    return handleResponse<{ success: boolean; message: string }>(response);
+  },
+
+  async getDashboardStats(token: string) {
+    const response = await fetch(`${API_BASE_URL}/api/seller/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return handleResponse<{ 
+      success: boolean; 
+      stats: {
+        totalProducts: number;
+        totalOrders: number;
+        totalSales: number;
+        pendingOrders: number;
+      }
+    }>(response);
+  },
+};
+
+export const categoriesApi = {
+  async getCategories() {
+    const response = await fetch(`${API_BASE_URL}/api/categories`);
+    return handleResponse<{ success: boolean; categories: any[] }>(response);
+  },
+};
+
 export { ApiError };

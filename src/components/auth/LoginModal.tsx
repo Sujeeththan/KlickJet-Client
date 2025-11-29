@@ -30,7 +30,7 @@ email: z
     .string()
     .trim()
     .min(1, "Email is required")
-    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Invalid email address")
+    // .regex(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Invalid email address")
     .toLowerCase(),
 
   password: z

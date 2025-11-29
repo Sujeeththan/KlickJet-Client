@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  email: z.string().min(2, "Email is required").regex(/ /),
+  email: z.string().min(2, "Email is required"),
   password: z
     .string()
     .min(8,"Password is requerd")
