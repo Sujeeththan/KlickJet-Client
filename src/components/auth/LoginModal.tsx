@@ -26,8 +26,21 @@ import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Invalid email address")
+    .toLowerCase(),
+
+  password: z
+    .string()
+    .trim()
+    .min(1, "Password is required")
+    .regex(
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
+      "Password must have 1 uppercase, 1 number, 1 special character, and be at least 8 characters"
+    ),
 });
 
 export function LoginModal() {
