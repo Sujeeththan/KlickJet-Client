@@ -15,6 +15,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
 
   // Load user and token from localStorage on mount
@@ -119,6 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
+      setIsLoggingOut(true);
       if (token) {
         await authApi.logout(token);
       }
@@ -131,6 +133,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(USER_KEY);
       toast.success('Logged out successfully');
       router.push('/');
+      // We don't reset isLoggingOut to false because we're navigating away
+      // and want to prevent ProtectedRoute from redirecting to login in the meantime
     }
   }, [token, router]);
 
@@ -157,6 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     register,
     logout,
     refreshUser,
+    isLoggingOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
