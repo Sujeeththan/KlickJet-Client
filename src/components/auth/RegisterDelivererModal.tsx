@@ -19,12 +19,43 @@ import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone_no: z.string().min(10, "Phone number must be at least 10 digits"),
-  vehicle_no: z.string().optional(),
-  vehicle_type: z.string().optional(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+ name: z
+    .string()
+    .trim()
+    .min(2, "Name is required")
+    .regex(/^[A-Za-z ]{2,}$/, "Name must contain only letters and spaces"),
+
+  email: z
+    .string()
+    .trim()
+    .min(20, "Email is required")
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Invalid email address")
+    .toLowerCase(),
+
+  phone_no: z
+    .string()
+    .trim()
+    .min(10, "Phone number is required")
+    .regex(/^[0-9]{10,15}$/, "Phone number must be 10–15 digits"),
+
+  vehicle_no: z
+    .string()
+    .trim()
+    .min(4, "Vehicle number is required"),
+
+  vehicle_type: z
+    .string()
+    .trim()
+    .min(2, "Vehicle type is required"),
+
+  password: z
+    .string()
+    .trim()
+    .min(8, "Password is required")
+    .regex(
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
+      "Password must have 1 uppercase, 1 number, 1 special character, and be at least 8 characters"
+    ),
 });
 
 export function RegisterDelivererModal() {
