@@ -1,17 +1,18 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { User, ShoppingCart, LogOut } from "lucide-react";
 import { LoginModal } from "@/features/auth/LoginModal";
 import { RegisterCustomerModal } from "@/features/auth/RegisterCustomerModal";
 import { RegisterSellerModal } from "@/features/auth/RegisterSellerModal";
 import { RegisterDelivererModal } from "@/features/auth/RegisterDelivererModal";
+import { Badge } from "@/components/ui/badge";
 
 export function Header() {
   const { user, logout } = useAuth();
+  const { cartCount } = useCart();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,21 +46,30 @@ export function Header() {
                 <User className="h-4 w-4" />
                 Dashboard
               </Link>
-              <Link 
-                href="/orders" 
-                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                Orders
-              </Link>
+              {user.role === "customer" && (
+                <Link 
+                  href="/cart" 
+                  className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors relative"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  Cart
+                  {cartCount > 0 && (
+                    <Badge variant="destructive" className="ml-1 h-5 min-w-5 flex items-center justify-center px-1 text-xs">
+                      {cartCount}
+                    </Badge>
+                  )}
+                </Link>
+              )}
               <span className="text-sm text-gray-600">{user.email}</span>
-              <button
-                onClick={logout}
-                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-                aria-label="Logout"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
+              {user.role !== 'admin' && user.role !== 'seller' && user.role !== 'deliverer' && (
+                <button
+                  onClick={logout}
+                  className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                  aria-label="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              )}
             </>
           ) : (
             <>

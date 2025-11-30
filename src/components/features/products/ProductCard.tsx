@@ -1,9 +1,14 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Package } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
+  id: number;
   title: string;
   description: string;
   price: number;
@@ -11,7 +16,13 @@ interface ProductCardProps {
   image?: string;
 }
 
-export function ProductCard({ title, description, price, seller, image }: ProductCardProps) {
+export function ProductCard({ id, title, description, price, seller, image }: ProductCardProps) {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart({ id, title, description, price, seller, image });
+  };
+
   return (
     <Card className="overflow-hidden">
       <div className="aspect-square relative bg-gray-100 flex items-center justify-center">
@@ -37,10 +48,19 @@ export function ProductCard({ title, description, price, seller, image }: Produc
         </div>
         <p className="text-xs text-muted-foreground mt-1">by {seller}</p>
       </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <Button className="w-full bg-gray-900 text-white hover:bg-gray-800">
-          View Details
+      <CardFooter className="p-4 pt-0 flex gap-2">
+        <Button 
+          onClick={handleAddToCart}
+          variant="outline"
+          className="flex-1"
+        >
+          Add to Cart
         </Button>
+        <Link href={`/products/${id}`} className="flex-1">
+          <Button className="w-full bg-gray-900 text-white hover:bg-gray-800">
+            View Details
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );
