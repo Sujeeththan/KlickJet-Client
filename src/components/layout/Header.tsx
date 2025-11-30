@@ -53,15 +53,13 @@ export function Header() {
                 Orders
               </Link>
               <span className="text-sm text-gray-600">{user.email}</span>
-              {user.role !== 'admin' && user.role !== 'seller' && user.role !== 'deliverer' && (
-                <button
-                  onClick={logout}
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-                  aria-label="Logout"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
-              )}
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                aria-label="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </>
           ) : (
             <>
