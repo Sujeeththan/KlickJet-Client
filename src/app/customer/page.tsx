@@ -4,11 +4,11 @@ import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ShoppingCart, Clock, CheckCircle, TrendingUp, ArrowRight, Package } from "lucide-react";
+import { ShoppingCart, Clock, CheckCircle, TrendingUp, ArrowRight, Package, LogOut } from "lucide-react";
 import Link from "next/link";
 
 export default function Page() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Mock data for stats - in a real app this would come from an API
   const stats = [
@@ -56,12 +56,18 @@ export default function Page() {
               <h1 className="text-3xl font-bold text-gray-900">Welcome back!</h1>
               <p className="text-gray-500 mt-1">{user?.email}</p>
             </div>
-            <Link href="/products">
-              <Button className="gap-2">
-                Continue Shopping
-                <ArrowRight className="h-4 w-4" />
+            <div className="flex gap-2">
+              <Link href="/products">
+                <Button className="gap-2">
+                  Continue Shopping
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Button onClick={logout} variant="outline" className="gap-2">
+                <LogOut className="h-4 w-4" />
+                Logout
               </Button>
-            </Link>
+            </div>
           </div>
 
           {/* Stats Grid */}
