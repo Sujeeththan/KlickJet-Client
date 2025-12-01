@@ -55,9 +55,19 @@ const formSchema = z.object({
     ),
 });
 
-export function RegisterCustomerModal() {
-  const [open, setOpen] = useState(false);
+interface RegisterCustomerModalProps {
+  trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function RegisterCustomerModal({ trigger, open: controlledOpen, onOpenChange: setControlledOpen }: RegisterCustomerModalProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const { register, isLoading } = useAuth();
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? setControlledOpen : setInternalOpen;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,7 +85,7 @@ export function RegisterCustomerModal() {
         ...values,
         role: "customer",
       });
-      setOpen(false);
+      if (setOpen) setOpen(false);
       form.reset();
     } catch (error) {
       // Error handled by AuthContext toast
@@ -85,7 +95,7 @@ export function RegisterCustomerModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Sign Up</Button>
+        {trigger || <Button>Sign Up</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
