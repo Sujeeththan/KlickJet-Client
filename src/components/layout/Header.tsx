@@ -4,10 +4,6 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { User, ShoppingCart, LogOut } from "lucide-react";
-import { LoginModal } from "@/features/auth/LoginModal";
-import { RegisterCustomerModal } from "@/features/auth/RegisterCustomerModal";
-import { RegisterSellerModal } from "@/features/auth/RegisterSellerModal";
-import { RegisterDelivererModal } from "@/features/auth/RegisterDelivererModal";
 import { Badge } from "@/components/ui/badge";
 
 export function Header() {
@@ -81,11 +77,31 @@ export function Header() {
             <>
               {mounted && (
                 <>
-                  <RegisterSellerModal />
-                  <RegisterDelivererModal />
+                  <Link 
+                    href="/auth/register/seller"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                  >
+                    Become a Seller
+                  </Link>
+                  <Link 
+                    href="/auth/register/deliverer"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                  >
+                    Join as Deliverer
+                  </Link>
                   <div className="flex items-center gap-3 ml-2">
-                    <RegisterCustomerModal />
-                    <LoginModal />
+                    <Link 
+                      href="/auth/register/customer"
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                    >
+                      Sign Up
+                    </Link>
+                    <Link 
+                      href="/auth/login"
+                      className="text-sm font-medium text-white bg-black hover:bg-gray-800 transition-colors px-4 py-2 rounded-md"
+                    >
+                      Sign In
+                    </Link>
                   </div>
                 </>
               )}

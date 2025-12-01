@@ -1,6 +1,6 @@
 import { AuthResponse, LoginCredentials, RegisterData } from '@/types/auth';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://klick-jet-api.vercel.app';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 class ApiError extends Error {
   constructor(public message: string, public statusCode: number) {

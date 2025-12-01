@@ -50,9 +50,15 @@ export default function AddProductPage() {
       // TODO: Replace with actual API call
       // const response = await fetch('/api/categories');
       setCategories([
-        { id: 1, name: "Electronics" },
-        { id: 2, name: "Clothing" },
-        { id: 3, name: "Books" },
+        { id: 1, name: "Beverages" },
+        { id: 2, name: "Groceries" },
+        { id: 3, name: "Personal Care" },
+        { id: 4, name: "Snacks" },
+        { id: 5, name: "Dairy & Eggs" },
+        { id: 6, name: "Bakery" },
+        { id: 7, name: "Household Essentials" },
+        { id: 8, name: "Fruits & Vegetables" },
+        { id: 9, name: "Meat & Seafood" },
       ]);
     } catch (error) {
       console.error("Error fetching categories:", error);
