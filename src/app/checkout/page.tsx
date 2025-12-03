@@ -125,7 +125,7 @@ export default function CheckoutPage() {
   const { items, cartTotal, clearCart } = useCart();
   const { user } = useAuth();
   const router = useRouter();
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 
   const deliveryFee = 2.99;
   const taxRate = 0.08;
@@ -170,14 +170,48 @@ export default function CheckoutPage() {
 
   function onSubmit(data: CheckoutFormValues) {
     console.log("Order Data:", data);
-    setShowSuccessModal(true);
+    
+    // Generate order ID
+    const orderId = `ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`;
+    
+    // Format full address
+    const fullAddress = `${data.address}, ${data.city}, Sri Lanka`;
+    
+    // Prepare order data for track-order page
+    const orderData = {
+      orderId,
+      deliveryAddress: fullAddress,
+      items: items.map(item => ({
+        name: item.title,
+        quantity: item.quantity,
+        price: item.price,
+        image: item.image,
+      })),
+      subtotal,
+      deliveryFee,
+      tax,
+      total,
+      shippingDetails: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        address: data.address,
+        city: data.city,
+        zipCode: data.zipCode,
+        phone: data.phone,
+      },
+      paymentMethod: data.paymentMethod,
+      timestamp: new Date().toISOString(),
+    };
+    
+    // Store order data in sessionStorage
+    sessionStorage.setItem("orderCompleted", "true");
+    sessionStorage.setItem("currentOrder", JSON.stringify(orderData));
+    console.log("Stored order data in sessionStorage:", orderData);
+    
+    router.push("/order-confirmed");
   }
 
-  function handleCloseSuccessModal() {
-    setShowSuccessModal(false);
-    clearCart();
-    router.push("/customer");
-  }
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -423,7 +457,7 @@ export default function CheckoutPage() {
                           <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                         </div>
                         <div className="text-sm font-medium">
-                          Rs. {(item.price * item.quantity).toFixed(2)}
+                          LKR {(item.price * item.quantity).toFixed(2)}
                         </div>
                       </div>
                     ))}
@@ -432,15 +466,15 @@ export default function CheckoutPage() {
                   <div className="space-y-3 mb-4 pt-4 border-t">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-medium">Rs. {subtotal.toFixed(2)}</span>
+                      <span className="font-medium">LKR {subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Delivery Fee</span>
-                      <span className="font-medium">Rs. {deliveryFee.toFixed(2)}</span>
+                      <span className="font-medium">LKR {deliveryFee.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Tax (8%)</span>
-                      <span className="font-medium">Rs. {tax.toFixed(2)}</span>
+                      <span className="font-medium">LKR {tax.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -448,7 +482,7 @@ export default function CheckoutPage() {
 
                   <div className="flex justify-between mb-6">
                     <span className="font-semibold text-lg">Total</span>
-                    <span className="font-bold text-xl">Rs. {total.toFixed(2)}</span>
+                    <span className="font-bold text-xl">LKR {total.toFixed(2)}</span>
                   </div>
 
                   <Button
@@ -463,21 +497,7 @@ export default function CheckoutPage() {
           </form>
         </Form>
 
-        <Dialog open={showSuccessModal} onOpenChange={handleCloseSuccessModal}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-center">Order Successful</DialogTitle>
-              <DialogDescription className="text-center text-lg py-4">
-                Your order was placed successfully.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="sm:justify-center">
-              <Button onClick={handleCloseSuccessModal} className="w-full sm:w-auto">
-                Continue Shopping
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+
       </main>
     </div>
   );

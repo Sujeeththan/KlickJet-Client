@@ -113,7 +113,7 @@ export default function CartPage() {
                               {item.title}
                             </h3>
                             <p className="text-sm text-muted-foreground">
-                              Rs. {item.price.toFixed(2)} / unit
+                              LKR {item.price.toFixed(2)} / unit
                             </p>
                           </div>
                         </div>
@@ -145,7 +145,7 @@ export default function CartPage() {
                           {/* Price and Delete */}
                           <div className="flex items-center gap-3">
                             <p className="font-bold text-base">
-                              Rs. {(item.price * item.quantity).toFixed(2)}
+                              LKR {(item.price * item.quantity).toFixed(2)}
                             </p>
                             <Button
                               variant="ghost"
@@ -174,15 +174,15 @@ export default function CartPage() {
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">Rs. {subtotal.toFixed(2)}</span>
+                    <span className="font-medium">LKR {subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Delivery Fee</span>
-                    <span className="font-medium">Rs. {deliveryFee.toFixed(2)}</span>
+                    <span className="font-medium">LKR {deliveryFee.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax (8%)</span>
-                    <span className="font-medium">Rs. {tax.toFixed(2)}</span>
+                    <span className="font-medium">LKR {tax.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -190,7 +190,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between mb-6">
                   <span className="font-semibold text-lg">Total</span>
-                  <span className="font-bold text-xl">Rs. {total.toFixed(2)}</span>
+                  <span className="font-bold text-xl">LKR {total.toFixed(2)}</span>
                 </div>
 
                 <Link href="/checkout">
