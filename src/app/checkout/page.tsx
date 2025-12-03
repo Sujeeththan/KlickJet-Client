@@ -127,7 +127,7 @@ export default function CheckoutPage() {
   const router = useRouter();
 
 
-  const deliveryFee = 2.99;
+  const deliveryFee = 300;
   const taxRate = 0.08;
   const subtotal = cartTotal;
   const tax = subtotal * taxRate;
