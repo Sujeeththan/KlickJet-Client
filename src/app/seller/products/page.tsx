@@ -202,18 +202,15 @@ export default function ProductsPage() {
     try {
       setSubmitting(true);
 
-      // Upload images first
-      const uploadedImageUrls = await uploadImagesToCloudinary(images, {
-        folder: "products",
-      });
-
+      // TODO: Implement image upload functionality
+      // For now, products will be created without images
       const productData = {
         name: formData.name,
         category: formData.category,
         description: formData.description,
         price: parseFloat(formData.price),
         instock: parseInt(formData.instock),
-        images: uploadedImageUrls,
+        images: [], // Empty array until image upload is implemented
       };
 
       await sellerApi.createProduct(user?.token!, productData);
@@ -259,17 +256,9 @@ export default function ProductsPage() {
     try {
       setSubmitting(true);
 
-      // Upload new images if any
-      let uploadedImageUrls: string[] = [];
-      if (images.length > 0) {
-        uploadedImageUrls = await uploadImagesToCloudinary(images, {
-          folder: "products",
-        });
-      }
-
-      // Combine existing images (from previews that are URLs) with new uploads
+      // TODO: Implement image upload functionality
+      // For now, keep existing images only
       const existingImages = imagePreviews.filter(preview => preview.startsWith('http'));
-      const allImages = [...existingImages, ...uploadedImageUrls];
 
       const productData = {
         name: formData.name,
@@ -277,7 +266,7 @@ export default function ProductsPage() {
         description: formData.description,
         price: parseFloat(formData.price),
         instock: parseInt(formData.instock),
-        images: allImages,
+        images: existingImages, // Only keep existing images until upload is implemented
       };
 
       await sellerApi.updateProduct(user?.token!, selectedProduct._id, productData);

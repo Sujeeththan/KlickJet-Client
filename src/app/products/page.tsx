@@ -20,7 +20,8 @@ const products = [
     price: 300.00,
     seller: "Sujee Grocery",
     category: "beverages",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 100
   },
   {
     id: 2,
@@ -29,7 +30,8 @@ const products = [
     price: 200.00,
     seller: "Sujee Grocery",
     category: "beverages",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 85
   },
   {
     id: 3,
@@ -38,7 +40,8 @@ const products = [
     price: 300.00,
     seller: "Sujee Grocery",
     category: "groceries",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 70
   },
   {
     id: 4,
@@ -47,7 +50,8 @@ const products = [
     price: 200.00,
     seller: "Sujee Grocery",
     category: "groceries",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 150
   },
   {
     id: 5,
@@ -56,7 +60,8 @@ const products = [
     price: 250.00,
     seller: "Sujee Grocery",
     category: "snacks",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 198
   },
   {
     id: 6,
@@ -65,7 +70,8 @@ const products = [
     price: 400.00,
     seller: "Sujee Grocery",
     category: "beverages",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 120
   },
   {
     id: 7,
@@ -74,7 +80,8 @@ const products = [
     price: 780.00,
     seller: "Sujee Grocery",
     category: "personal-care",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 45
   },
   {
     id: 8,
@@ -83,7 +90,8 @@ const products = [
     price: 160.00,
     seller: "Sujee Grocery",
     category: "personal-care",
-    image: "/placeholder.png"
+    image: "/placeholder.png",
+    stock: 200
   },
   // Add more items to match the grid if needed
 ];
@@ -219,6 +227,7 @@ function ProductList() {
                   price={product.price}
                   seller={product.seller}
                   image={product.image}
+                  stock={product.stock}
                 />
               ))}
             </div>

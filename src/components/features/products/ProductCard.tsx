@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Package } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Package, MapPin, ArrowRight } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
@@ -14,9 +14,10 @@ interface ProductCardProps {
   price: number;
   seller: string;
   image?: string;
+  stock?: number;
 }
 
-export function ProductCard({ id, title, description, price, seller, image }: ProductCardProps) {
+export function ProductCard({ id, title, description, price, seller, image, stock = 100 }: ProductCardProps) {
   const { addToCart } = useCart();
 
   const handleAddToCart = () => {
@@ -24,44 +25,51 @@ export function ProductCard({ id, title, description, price, seller, image }: Pr
   };
 
   return (
-    <Card className="overflow-hidden h-full flex flex-col">
-      <div className="aspect-square relative bg-gray-100 flex items-center justify-center">
+    <Card className="overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow duration-300 bg-white rounded-xl border border-gray-200">
+      {/* Product Image */}
+      <div className="aspect-[4/2] relative bg-gray-50 flex items-center justify-center overflow-hidden">
         {image ? (
           <Image
             src={image}
             alt={title}
             fill
-            className="object-cover"
+            className="object-cover hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <Package className="h-12 w-12 text-gray-400" />
+          <Package className="h-5 w-5 text-gray-300" />
         )}
       </div>
-      <CardContent className="p-3 flex-1">
-        <h3 className="font-semibold text-base mb-1">{title}</h3>
-        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-          {description}
-        </p>
-        <div className="flex items-baseline justify-between mt-2">
-          <span className="text-lg font-bold">Rs. {price.toFixed(2)}</span>
+
+      {/* Product Details */}
+      <CardContent className="p-2.5 flex-1 flex flex-col">
+        {/* Product Title */}
+        <h3 className="font-semibold text-sm text-gray-900 mb-0.5">{title}</h3>
+        
+        {/* Description */}
+        <p className="text-xs text-gray-600 mb-1.5">{description}</p>
+        
+        {/* Price */}
+        <p className="text-base font-bold text-gray-900 mb-0.5">Rs. {price.toFixed(2)}</p>
+        
+        {/* Stock */}
+        <p className="text-xs text-gray-500 mb-0.5">Stock: {stock}</p>
+        
+        {/* Store/Seller Info */}
+        <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
+          <MapPin className="h-3 w-3" />
+          <span>{seller}</span>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-1">by {seller}</p>
-      </CardContent>
-      <CardFooter className="p-3 pt-0 flex gap-2">
-        <Button 
-          onClick={handleAddToCart}
-          variant="outline"
-          size="sm"
-          className="flex-1 text-xs h-8"
-        >
-          Add to Cart
-        </Button>
-        <Link href={`/products/${id}`} className="flex-1">
-          <Button size="sm" className="w-full bg-gray-900 text-white hover:bg-gray-800 text-xs h-8">
+        
+        {/* View Details Button */}
+        <Link href={`/products/${id}`} className="mt-auto">
+          <Button 
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-lg py-1.5 flex items-center justify-center gap-1.5 text-xs"
+          >
             View Details
+            <ArrowRight className="h-3 w-3" />
           </Button>
         </Link>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 }
