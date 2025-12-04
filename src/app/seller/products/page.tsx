@@ -110,18 +110,26 @@ export default function ProductsPage() {
   const fetchCategories = async () => {
     try {
       setCategories([
-        { id: 1, name: "Books" },
-        { id: 2, name: "Electronics" },
-        { id: 3, name: "Other" },
-        { id: 4, name: "Beverages" },
-        { id: 5, name: "Groceries" },
-        { id: 6, name: "Personal Care" },
-        { id: 7, name: "Snacks" },
-        { id: 8, name: "Dairy & Eggs" },
-        { id: 9, name: "Bakery" },
-        { id: 10, name: "Household Essentials" },
-        { id: 11, name: "Fruits & Vegetables" },
-        { id: 12, name: "Meat & Seafood" },
+        { id: 1, name: "Fruits & Vegetables" },
+        { id: 2, name: "Dairy & Eggs" },
+        { id: 3, name: "Meat & Seafood" },
+        { id: 4, name: "Bakery & Bread" },
+        { id: 5, name: "Beverages" },
+        { id: 6, name: "Snacks & Confectionery" },
+        { id: 7, name: "Cereals & Breakfast" },
+        { id: 8, name: "Rice, Flour & Grains" },
+        { id: 9, name: "Cooking Oil & Ghee" },
+        { id: 10, name: "Spices & Seasonings" },
+        { id: 11, name: "Canned & Packaged Foods" },
+        { id: 12, name: "Pasta & Noodles" },
+        { id: 13, name: "Sauces & Condiments" },
+        { id: 14, name: "Tea & Coffee" },
+        { id: 15, name: "Personal Care" },
+        { id: 16, name: "Household Essentials" },
+        { id: 17, name: "Baby Care" },
+        { id: 18, name: "Health & Wellness" },
+        { id: 19, name: "Frozen Foods" },
+        { id: 20, name: "Other" },
       ]);
     } catch (error) {
       console.error("Error fetching categories:", error);
