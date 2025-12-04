@@ -44,7 +44,6 @@ import { useEffect, useState } from "react";
 import { Edit2, Plus, Trash2, X, ImagePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { sellerApi } from "@/services/api";
-import { uploadImagesToCloudinary } from "@/lib/cloudinary";
 
 interface Product {
   _id: string;
