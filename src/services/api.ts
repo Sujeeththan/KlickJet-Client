@@ -1,323 +1,133 @@
+import apiClient from "@/lib/apiClient";
 import { AuthResponse, LoginCredentials, RegisterData } from "@/types/auth";
 
-// Ensure baseURL includes /api prefix if not already included
-const getBaseURL = () => {
-  const url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-  // If URL doesn't end with /api, add it
-  return url.endsWith("/api") ? url : `${url}/api`;
-};
-
-const API_BASE_URL = getBaseURL();
-
-class ApiError extends Error {
-  constructor(public message: string, public statusCode: number) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  let data;
-  try {
-    data = await response.json();
-  } catch (error) {
-    throw new ApiError("Invalid response from server", response.status);
-  }
-
-  if (!response.ok) {
-    throw new ApiError(
-      data.message || data.error || "An error occurred",
-      response.status
-    );
-  }
-
-  return data;
-}
-
-export const authApi = {
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-        credentials: "omit",
-      });
-
-      return handleResponse<AuthResponse>(response);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(
-        "Unable to connect to server. Please check your internet connection.",
-        0
-      );
-    }
+// --- Auth Service ---
+export const authService = {
+  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>("/auth/login", credentials);
+    return response.data;
   },
 
-  async register(data: RegisterData): Promise<AuthResponse> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-        mode: "cors",
-        credentials: "omit",
-      });
-
-      return handleResponse<AuthResponse>(response);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(
-        "Unable to connect to server. Please check your internet connection.",
-        0
-      );
-    }
+  register: async (data: RegisterData): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>("/auth/register", data);
+    return response.data;
   },
 
-  async getMe(token: string): Promise<AuthResponse> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        mode: "cors",
-        credentials: "omit",
-      });
-
-      return handleResponse<AuthResponse>(response);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(
-        "Unable to connect to server. Please check your internet connection.",
-        0
-      );
-    }
+  getCurrentUser: async (): Promise<AuthResponse> => {
+    const response = await apiClient.get<AuthResponse>("/auth/me");
+    return response.data;
   },
 
-  async logout(token: string): Promise<{ success: boolean; message: string }> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        mode: "cors",
-        credentials: "omit",
-      });
-
-      return handleResponse<{ success: boolean; message: string }>(response);
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
-      }
-      throw new ApiError(
-        "Unable to connect to server. Please check your internet connection.",
-        0
-      );
-    }
+  logout: async (): Promise<{ success: boolean; message: string }> => {
+    const response = await apiClient.post<{ success: boolean; message: string }>("/auth/logout");
+    return response.data;
   },
 };
 
-export const adminApi = {
-  async getPendingSellers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/sellers/pending`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; sellers: any[] }>(response);
+// --- Admin Service ---
+export const adminService = {
+  getPendingSellers: async () => {
+    const response = await apiClient.get<{ success: boolean; sellers: any[] }>("/admin/sellers/pending");
+    return response.data;
   },
 
-  async getAllSellers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/sellers`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; sellers: any[] }>(response);
+  getAllSellers: async () => {
+    const response = await apiClient.get<{ success: boolean; sellers: any[] }>("/admin/sellers");
+    return response.data;
   },
 
-  async approveSeller(token: string, id: string) {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/sellers/${id}/approve`,
-      {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    return handleResponse<{ success: boolean; message: string }>(response);
+  approveSeller: async (id: string) => {
+    const response = await apiClient.put<{ success: boolean; message: string }>(`/admin/sellers/${id}/approve`);
+    return response.data;
   },
 
-  async rejectSeller(token: string, id: string, rejectionReason: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/sellers/${id}/reject`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ rejectionReason }),
-    });
-    return handleResponse<{ success: boolean; message: string }>(response);
+  rejectSeller: async (id: string, rejectionReason: string) => {
+    const response = await apiClient.put<{ success: boolean; message: string }>(`/admin/sellers/${id}/reject`, { rejectionReason });
+    return response.data;
   },
 
-  async deleteSeller(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/sellers/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; message: string }>(response);
+  deleteSeller: async (id: string) => {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(`/admin/sellers/${id}`);
+    return response.data;
   },
 
-  async getPendingDeliverers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/deliverers/pending`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; deliverers: any[] }>(response);
+  getPendingDeliverers: async () => {
+    const response = await apiClient.get<{ success: boolean; deliverers: any[] }>("/admin/deliverers/pending");
+    return response.data;
   },
 
-  async getAllDeliverers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/deliverers`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; deliverers: any[] }>(response);
+  getAllDeliverers: async () => {
+    const response = await apiClient.get<{ success: boolean; deliverers: any[] }>("/admin/deliverers");
+    return response.data;
   },
 
-  async approveDeliverer(token: string, id: string) {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/deliverers/${id}/approve`,
-      {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    return handleResponse<{ success: boolean; message: string }>(response);
+  approveDeliverer: async (id: string) => {
+    const response = await apiClient.put<{ success: boolean; message: string }>(`/admin/deliverers/${id}/approve`);
+    return response.data;
   },
 
-  async rejectDeliverer(token: string, id: string, rejectionReason: string) {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/deliverers/${id}/reject`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ rejectionReason }),
-      }
-    );
-    return handleResponse<{ success: boolean; message: string }>(response);
+  rejectDeliverer: async (id: string, rejectionReason: string) => {
+    const response = await apiClient.put<{ success: boolean; message: string }>(`/admin/deliverers/${id}/reject`, { rejectionReason });
+    return response.data;
   },
 
-  async deleteDeliverer(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/deliverers/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; message: string }>(response);
+  deleteDeliverer: async (id: string) => {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(`/admin/deliverers/${id}`);
+    return response.data;
   },
 
-  async getAllUsers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/admin/users`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; users: any[]; count: number }>(
-      response
-    );
+  getAllUsers: async () => {
+    const response = await apiClient.get<{ success: boolean; users: any[]; count: number }>("/admin/users");
+    return response.data;
   },
 
-  async deleteUser(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; message: string }>(response);
+  deleteUser: async (id: string) => {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(`/users/${id}`);
+    return response.data;
   },
 };
 
-export const sellerApi = {
-  async getSellerProducts(token: string) {
-    const response = await fetch(`${API_BASE_URL}/products`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; products: any[] }>(response);
+// --- Seller Service ---
+export const sellerService = {
+  getSellerProducts: async () => {
+    const response = await apiClient.get<{ success: boolean; products: any[] }>("/products");
+    return response.data;
   },
 
-  async createProduct(token: string, productData: any) {
-    const response = await fetch(`${API_BASE_URL}/products`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
-    });
-    return handleResponse<{ success: boolean; message: string; product: any }>(
-      response
-    );
+  createProduct: async (productData: any) => {
+    const response = await apiClient.post<{ success: boolean; message: string; product: any }>("/products", productData);
+    return response.data;
   },
 
-  async updateProduct(token: string, id: string, productData: any) {
-    const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
-    });
-    return handleResponse<{ success: boolean; message: string; product: any }>(
-      response
-    );
+  updateProduct: async (id: string, productData: any) => {
+    // Corrected endpoint from /api/products to /products as baseURL already has /api
+    const response = await apiClient.put<{ success: boolean; message: string; product: any }>(`/products/${id}`, productData);
+    return response.data;
   },
 
-  async deleteProduct(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/products/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; message: string }>(response);
+  deleteProduct: async (id: string) => {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(`/products/${id}`);
+    return response.data;
   },
 
-  async getSellerOrders(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/orders`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; orders: any[] }>(response);
+  getSellerOrders: async () => {
+    // Corrected endpoint from /api/orders to /orders
+    const response = await apiClient.get<{ success: boolean; orders: any[] }>("/orders");
+    return response.data;
   },
 
-  async getOrderById(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; order: any }>(response);
+  getOrderById: async (id: string) => {
+    const response = await apiClient.get<{ success: boolean; order: any }>(`/orders/${id}`);
+    return response.data;
   },
 
-  async updateOrderStatus(token: string, id: string, status: string) {
-    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    });
-    return handleResponse<{ success: boolean; message: string }>(response);
+  updateOrderStatus: async (id: string, status: string) => {
+    const response = await apiClient.put<{ success: boolean; message: string }>(`/orders/${id}`, { status });
+    return response.data;
   },
 
-  async getDashboardStats(token: string) {
-    const response = await fetch(`${API_BASE_URL}/seller/stats`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{
+  getDashboardStats: async () => {
+    const response = await apiClient.get<{
       success: boolean;
       stats: {
         totalProducts: number;
@@ -325,72 +135,52 @@ export const sellerApi = {
         totalSales: number;
         pendingOrders: number;
       };
-    }>(response);
+    }>("/seller/stats");
+    return response.data;
   },
 };
 
-export const categoriesApi = {
-  async getCategories() {
-    const response = await fetch(`${API_BASE_URL}/categories`);
-    return handleResponse<{ success: boolean; categories: any[] }>(response);
+// --- Category Service ---
+export const categoryService = {
+  getCategories: async () => {
+    const response = await apiClient.get<{ success: boolean; categories: any[] }>("/categories");
+    return response.data;
   },
 };
 
-export const cartApi = {
-  async getCart(token: string) {
-    const response = await fetch(`${API_BASE_URL}/cart`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; cart: any }>(response);
+// --- Cart Service ---
+export const cartService = {
+  getCart: async () => {
+    const response = await apiClient.get<{ success: boolean; cart: any }>("/cart");
+    return response.data;
   },
 
-  async addToCart(token: string, productId: string, quantity: number = 1) {
-    const response = await fetch(`${API_BASE_URL}/cart`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ productId, quantity }),
-    });
-    return handleResponse<{ success: boolean; message: string; cart: any }>(
-      response
-    );
+  addToCart: async (productId: string, quantity: number = 1) => {
+    const response = await apiClient.post<{ success: boolean; message: string; cart: any }>("/cart", { productId, quantity });
+    return response.data;
   },
 
-  async updateCartItem(token: string, itemId: string, quantity: number) {
-    const response = await fetch(`${API_BASE_URL}/cart/${itemId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ quantity }),
-    });
-    return handleResponse<{ success: boolean; message: string; cart: any }>(
-      response
-    );
+  updateCartItem: async (itemId: string, quantity: number) => {
+    const response = await apiClient.put<{ success: boolean; message: string; cart: any }>(`/cart/${itemId}`, { quantity });
+    return response.data;
   },
 
-  async removeFromCart(token: string, itemId: string) {
-    const response = await fetch(`${API_BASE_URL}/api/cart/${itemId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; message: string; cart: any }>(
-      response
-    );
+  removeFromCart: async (itemId: string) => {
+    // Corrected endpoint
+    const response = await apiClient.delete<{ success: boolean; message: string; cart: any }>(`/cart/${itemId}`);
+    return response.data;
   },
 
-  async clearCart(token: string) {
-    const response = await fetch(`${API_BASE_URL}/cart`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return handleResponse<{ success: boolean; message: string; cart: any }>(
-      response
-    );
+  clearCart: async () => {
+    const response = await apiClient.delete<{ success: boolean; message: string; cart: any }>("/cart");
+    return response.data;
   },
 };
 
-export { ApiError };
+// Aliases for backward compatibility (Optional, but helps if user isn't updating all imports immediately)
+// If you want strict refactoring, remove these and update imports.
+export const authApi = authService;
+export const adminApi = adminService;
+export const sellerApi = sellerService;
+export const categoriesApi = categoryService;
+export const cartApi = cartService;
