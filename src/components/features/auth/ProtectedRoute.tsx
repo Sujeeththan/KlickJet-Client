@@ -16,15 +16,15 @@ export function ProtectedRoute({
   allowedRoles,
   requireAuth = true,
 }: ProtectedRouteProps) {
-  const { user, isLoading, isAuthenticated, isLoggingOut } = useAuth();
+  const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading || isLoggingOut) return;
+    if (loading) return;
 
     // If authentication is required but user is not authenticated
     if (requireAuth && !isAuthenticated) {
-      router.push("/auth/login");
+      router.replace("/auth/login");
       return;
     }
 
@@ -32,25 +32,25 @@ export function ProtectedRoute({
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {
       // Redirect to their appropriate dashboard
       const redirectPath = getRoleRedirectPath(user.role);
-      router.push(redirectPath);
+      router.replace(redirectPath);
       return;
     }
 
     // Check for pending approval status
     if (user && (user.role === "seller" || user.role === "deliverer")) {
       if (user.status === "pending") {
-        router.push("/auth/pending-approval");
+        router.replace("/auth/pending-approval");
         return;
       }
       if (user.status === "rejected") {
-        router.push("/auth/rejected");
+        router.replace("/auth/rejected");
         return;
       }
     }
-  }, [isLoading, isAuthenticated, user, allowedRoles, requireAuth, router]);
+  }, [loading, isAuthenticated, user, allowedRoles, requireAuth, router]);
 
   // Show loading state
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

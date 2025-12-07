@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -65,8 +66,9 @@ const formSchema = z.object({
 });
 
 export default function RegisterSellerPage() {
-  const { register, isLoading } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -81,15 +83,22 @@ export default function RegisterSellerPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     try {
-      await register({
+      const { authService } = await import("@/services/auth.service");
+      const response = await authService.register({
         ...values,
         role: "seller",
       });
-      form.reset();
-      router.push("/");
-    } catch (error) {
-      // Error handled by AuthContext toast
+      
+      if (response.token && response.user) {
+        await login(response.token, response.user);
+      }
+    } catch (error: any) {
+      const { toast } = await import("sonner");
+      toast.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setIsLoading(false);
     }
   }
 

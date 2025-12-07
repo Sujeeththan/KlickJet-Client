@@ -51,12 +51,19 @@ export function FormRhfInput() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
       setIsSubmitting(true);
-      await login({
+      const response = await import("@/services/auth.service").then(m => m.authService.login({
         email: data.email,
         password: data.password,
-      });
-    } catch (error) {
+        role: "admin", // Explicitly specify admin role for admin login
+      }));
+      
+      if (response.token && response.user) {
+        await login(response.token, response.user);
+      }
+    } catch (error: any) {
       console.error("Login error:", error);
+      const { toast } = await import("sonner");
+      toast.error(error.response?.data?.message || "Login failed");
     } finally {
       setIsSubmitting(false);
     }

@@ -45,7 +45,7 @@ email: z
 
 export function LoginModal() {
   const [open, setOpen] = useState(false);
-  const { login, isLoading } = useAuth();
+  const { login, loading } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,11 +57,20 @@ export function LoginModal() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await login(values);
-      setOpen(false);
-      form.reset();
-    } catch (error) {
-      // Error handled by AuthContext toast
+      const response = await import("@/services/auth.service").then(m => m.authService.login({
+        email: values.email,
+        password: values.password,
+      }));
+      
+      if (response.token && response.user) {
+        await login(response.token, response.user);
+        setOpen(false);
+        form.reset();
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      const { toast } = await import("sonner");
+      toast.error(error.response?.data?.message || "Login failed");
     }
   }
 
@@ -105,8 +114,8 @@ export function LoginModal() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Sign In
             </Button>
           </form>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { adminApi } from "@/services/api";
+import { userService } from "@/services/user.service";
+import { User } from "@/types/user";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,22 +35,13 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
-interface Seller {
-  _id: string;
-  name: string;
-  shopName: string;
-  email: string;
-  phone_no: string;
-  address: string;
-  status: string;
-  rejectionReason?: string;
-  createdAt: string;
-}
+// Use User type directly since the API returns User objects
+type Seller = User;
 
 const ITEMS_PER_PAGE = 10;
 
 export default function SellersPage() {
-  const { token } = useAuth();
+  // const { token } = useAuth();
   const [allSellers, setAllSellers] = useState<Seller[]>([]);
   const [filteredSellers, setFilteredSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,21 +57,17 @@ export default function SellersPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-    }
-  }, [token]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     filterSellers();
   }, [allSellers, statusFilter]);
 
   const fetchData = async () => {
-    if (!token) return;
-
     setLoading(true);
     try {
-      const response = await adminApi.getAllSellers(token);
+      const response = await userService.getAllSellers();
       setAllSellers(response.sellers || []);
     } catch (error: any) {
       toast.error(error.message || "Failed to fetch sellers");
@@ -114,11 +102,11 @@ export default function SellersPage() {
   };
 
   const confirmApprove = async () => {
-    if (!selectedSeller || !token) return;
+    if (!selectedSeller) return;
 
     setActionLoading(selectedSeller._id);
     try {
-      await adminApi.approveSeller(token, selectedSeller._id);
+      await userService.approveSeller(selectedSeller._id);
       toast.success("Seller approved successfully");
       setApproveDialogOpen(false);
       setSelectedSeller(null);
@@ -131,7 +119,7 @@ export default function SellersPage() {
   };
 
   const confirmReject = async () => {
-    if (!selectedSeller || !token) return;
+    if (!selectedSeller) return;
 
     if (!rejectionReason.trim()) {
       toast.error("Please provide a rejection reason");
@@ -140,7 +128,7 @@ export default function SellersPage() {
 
     setActionLoading(selectedSeller._id);
     try {
-      await adminApi.rejectSeller(token, selectedSeller._id, rejectionReason);
+      await userService.rejectSeller(selectedSeller._id, rejectionReason);
       toast.success("Seller rejected successfully");
       setRejectDialogOpen(false);
       setSelectedSeller(null);
@@ -154,11 +142,11 @@ export default function SellersPage() {
   };
 
   const confirmDelete = async () => {
-    if (!selectedSeller || !token) return;
+    if (!selectedSeller) return;
 
     setActionLoading(selectedSeller._id);
     try {
-      await adminApi.deleteSeller(token, selectedSeller._id);
+      await userService.deleteSeller(selectedSeller._id);
       toast.success("Seller deleted successfully");
       setDeleteDialogOpen(false);
       setSelectedSeller(null);
@@ -170,7 +158,8 @@ export default function SellersPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status?: string) => {
+    if (!status) return <Badge>Unknown</Badge>;
     switch (status.toLowerCase()) {
       case "approved":
         return <Badge className="bg-green-500 hover:bg-green-600">Approved</Badge>;

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { adminApi } from "@/services/api";
+import { userService } from "@/services/user.service";
+import { User } from "@/types/user";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,26 +25,10 @@ import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-interface User {
-  _id: string;
-  name: string;
-  shopName?: string;
-  email: string;
-  phone_no?: string;
-  address?: string;
-  vehicle_type?: string;
-  vehicle_no?: string;
-  role: string;
-  status: string;
-  rejectionReason?: string;
-  createdAt: string;
-  type: string;
-}
-
 const ITEMS_PER_PAGE = 10;
 
 export default function UsersPage() {
-  const { token } = useAuth();
+  // const { token } = useAuth(); // Token handled by cookie
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,21 +36,17 @@ export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-    }
-  }, [token]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     filterUsers();
   }, [allUsers, roleFilter]);
 
   const fetchData = async () => {
-    if (!token) return;
-
     setLoading(true);
     try {
-      const response = await adminApi.getAllUsers(token);
+      const response = await userService.getAllUsers();
       setAllUsers(response.users || []);
     } catch (error: any) {
       toast.error(error.message || "Failed to fetch users");
@@ -83,7 +64,8 @@ export default function UsersPage() {
     setCurrentPage(1);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status?: string) => {
+    if (!status) return <Badge>Unknown</Badge>;
     switch (status.toLowerCase()) {
       case "approved":
       case "active":

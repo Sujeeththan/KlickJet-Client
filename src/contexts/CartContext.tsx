@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { toast } from "sonner";
-import { cartApi } from "@/services/api";
+import { cartService } from "@/services/cart.service";
 import { useAuth } from "./AuthContext";
 
 export interface CartItem {
@@ -34,18 +34,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, token, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   // Load cart from backend or localStorage on mount
   useEffect(() => {
     const loadCart = async () => {
       setMounted(true);
       
-      if (isAuthenticated && token) {
+      if (isAuthenticated) {
         // Load from backend for authenticated users
         try {
           setIsLoading(true);
-          const response = await cartApi.getCart(token);
+          const response = await cartService.getCart();
           if (response.success && response.cart) {
             // Transform backend cart items to frontend format
             const transformedItems = response.cart.items.map((item: any) => ({
@@ -72,7 +72,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
 
     loadCart();
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated]);
 
   const loadFromLocalStorage = () => {
     const savedCart = localStorage.getItem("klickjet-cart");
@@ -94,10 +94,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Sync cart with backend
   const syncCart = async () => {
-    if (!isAuthenticated || !token) return;
+    if (!isAuthenticated) return;
 
     try {
-      const response = await cartApi.getCart(token);
+      const response = await cartService.getCart();
       if (response.success && response.cart) {
         const transformedItems = response.cart.items.map((item: any) => ({
           _id: item._id,
@@ -115,11 +115,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const addToCart = async (product: Omit<CartItem, "quantity">, quantity: number = 1) => {
-    if (isAuthenticated && token) {
+    if (isAuthenticated) {
       // Add to backend for authenticated users
       try {
         setIsLoading(true);
-        const response = await cartApi.addToCart(token, product.id.toString(), quantity);
+        const response = await cartService.addToCart(product.id.toString(), quantity);
         if (response.success) {
           toast.success(`${product.title} added to cart`);
           await syncCart();
@@ -151,14 +151,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const removeFromCart = async (productId: number | string) => {
-    if (isAuthenticated && token) {
+    if (isAuthenticated) {
       // Remove from backend for authenticated users
       try {
         setIsLoading(true);
         // Find the cart item ID
         const item = items.find((item) => item.id === productId);
         if (item && item._id) {
-          const response = await cartApi.removeFromCart(token, item._id);
+          const response = await cartService.removeItem(item._id);
           if (response.success) {
             toast.success(`${item.title} removed from cart`);
             await syncCart();
@@ -188,13 +188,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (isAuthenticated && token) {
+    if (isAuthenticated) {
       // Update in backend for authenticated users
       try {
         setIsLoading(true);
         const item = items.find((item) => item.id === productId);
         if (item && item._id) {
-          const response = await cartApi.updateCartItem(token, item._id, quantity);
+          const response = await cartService.updateItem(item._id, quantity);
           if (response.success) {
             await syncCart();
           }
@@ -216,11 +216,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const clearCart = async () => {
-    if (isAuthenticated && token) {
+    if (isAuthenticated) {
       // Clear backend cart for authenticated users
       try {
         setIsLoading(true);
-        const response = await cartApi.clearCart(token);
+        const response = await cartService.clearCart();
         if (response.success) {
           setItems([]);
           toast.success("Cart cleared");

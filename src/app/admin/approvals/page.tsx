@@ -22,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { adminApi } from "@/services/api";
+import { userService } from "@/services/user.service";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, CheckCircle, XCircle, Trash2 } from "lucide-react";
 
@@ -39,7 +39,7 @@ interface User {
 }
 
 export default function ApprovalsPage() {
-  const { token } = useAuth();
+  // const { token } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -57,16 +57,15 @@ export default function ApprovalsPage() {
 
   useEffect(() => {
     fetchPendingUsers();
-  }, [token]);
+  }, []);
 
   const fetchPendingUsers = async () => {
-    if (!token) return;
     
     setIsLoading(true);
     try {
       const [sellersRes, deliverersRes] = await Promise.all([
-        adminApi.getPendingSellers(token),
-        adminApi.getPendingDeliverers(token),
+        userService.getPendingSellers(),
+        userService.getPendingDeliverers(),
       ]);
 
       const sellers = sellersRes.sellers.map((s: any) => ({
@@ -103,14 +102,14 @@ export default function ApprovalsPage() {
   };
 
   const confirmApprove = async () => {
-    if (!selectedUser || !token) return;
+    if (!selectedUser) return;
 
     setActionLoading(selectedUser._id);
     try {
       if (selectedUser.role === "seller") {
-        await adminApi.approveSeller(token, selectedUser._id);
+        await userService.approveSeller(selectedUser._id);
       } else {
-        await adminApi.approveDeliverer(token, selectedUser._id);
+        await userService.approveDeliverer(selectedUser._id);
       }
 
       toast.success(`${selectedUser.name} approved successfully`);
@@ -125,7 +124,7 @@ export default function ApprovalsPage() {
   };
 
   const confirmReject = async () => {
-    if (!selectedUser || !token) return;
+    if (!selectedUser) return;
 
     if (!rejectionReason.trim()) {
       toast.error("Please provide a rejection reason");
@@ -135,9 +134,9 @@ export default function ApprovalsPage() {
     setActionLoading(selectedUser._id);
     try {
       if (selectedUser.role === "seller") {
-        await adminApi.rejectSeller(token, selectedUser._id, rejectionReason);
+        await userService.rejectSeller(selectedUser._id, rejectionReason);
       } else {
-        await adminApi.rejectDeliverer(token, selectedUser._id, rejectionReason);
+        await userService.rejectDeliverer(selectedUser._id, rejectionReason);
       }
 
       toast.success(`${selectedUser.name} rejected successfully`);
@@ -153,14 +152,14 @@ export default function ApprovalsPage() {
   };
 
   const confirmDelete = async () => {
-    if (!selectedUser || !token) return;
+    if (!selectedUser) return;
 
     setActionLoading(selectedUser._id);
     try {
       if (selectedUser.role === "seller") {
-        await adminApi.deleteSeller(token, selectedUser._id);
+        await userService.deleteSeller(selectedUser._id);
       } else {
-        await adminApi.deleteDeliverer(token, selectedUser._id);
+        await userService.deleteDeliverer(selectedUser._id);
       }
 
       toast.success(`${selectedUser.name} deleted successfully`);

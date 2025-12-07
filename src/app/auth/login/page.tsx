@@ -1,9 +1,12 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/contexts/AuthContext";
+import { authService } from "@/services/auth.service";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,13 +19,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Loader2, ShoppingBasket } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "Email is required")
-    .toLowerCase(),
+  email: z.string().trim().min(1, "Email is required").toLowerCase(),
 
   password: z
     .string()
@@ -35,7 +35,9 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { login, isLoading } = useAuth();
+  const { login, loading, isAuthenticated, user } = useAuth();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,13 +47,72 @@ export default function LoginPage() {
     },
   });
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated && user) {
+      const redirectPath = getRoleRedirectPath(user.role);
+      router.replace(redirectPath);
+    }
+  }, [loading, isAuthenticated, user, router]);
+
+  // Helper function for role-based redirect
+  function getRoleRedirectPath(role: string): string {
+    switch (role) {
+      case "admin":
+        return "/admin";
+      case "customer":
+        return "/customer";
+      case "seller":
+        return "/seller";
+      case "deliverer":
+        return "/deliverer";
+      default:
+        return "/";
+    }
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    form.clearErrors("root"); // Clear previous errors
+
     try {
-      await login({ email: values.email, password: values.password });
-      form.reset();
-      // Redirect is handled by AuthContext based on user role
-    } catch (error) {
-      // Error handled by AuthContext toast
+      const response = await authService.login({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (response.token && response.user) {
+        await login(response.token, response.user);
+        // Success - redirect will happen in AuthContext.login()
+        toast.success("Login successful!");
+      } else {
+        throw new Error("No token received from server");
+      }
+    } catch (error: any) {
+      console.error("Login error", error);
+
+      // Extract error message
+      let errorMessage = "Login failed. Please check your credentials.";
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      // Show error to user
+      form.setError("root", {
+        message: errorMessage,
+      });
+
+      // Show toast notification
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -99,22 +160,39 @@ export default function LoginPage() {
               />
 
               <div className="text-right">
-                <Link href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link
+                  href="#"
+                  className="text-sm text-gray-600 hover:text-gray-900"
+                >
                   Forgot password?
                 </Link>
               </div>
 
-              <Button type="submit" className="w-full bg-black hover:bg-gray-800" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Log In
+              <Button
+                type="submit"
+                className="w-full bg-black hover:bg-gray-800"
+                disabled={loading || isSubmitting}
+              >
+                {(loading || isSubmitting) && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {isSubmitting ? "Logging in..." : "Log In"}
               </Button>
+
+              {form.formState.errors.root && (
+                <p className="text-sm text-red-600 text-center">
+                  {form.formState.errors.root.message}
+                </p>
+              )}
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500">Or Continue With</span>
+                  <span className="bg-white px-2 text-gray-500">
+                    Or Continue With
+                  </span>
                 </div>
               </div>
 
@@ -129,7 +207,10 @@ export default function LoginPage() {
 
               <p className="text-center text-sm text-gray-600">
                 Don't have account?{" "}
-                <Link href="/auth/register/customer" className="text-gray-900 hover:text-gray-700 font-medium">
+                <Link
+                  href="/auth/register/customer"
+                  className="text-gray-900 hover:text-gray-700 font-medium"
+                >
                   Sign up
                 </Link>
               </p>

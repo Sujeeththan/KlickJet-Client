@@ -63,7 +63,7 @@ interface RegisterCustomerModalProps {
 
 export function RegisterCustomerModal({ trigger, open: controlledOpen, onOpenChange: setControlledOpen }: RegisterCustomerModalProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const { register, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : internalOpen;
@@ -81,14 +81,24 @@ export function RegisterCustomerModal({ trigger, open: controlledOpen, onOpenCha
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await register({
+      setIsLoading(true);
+      const response = await import("@/services/auth.service").then(m => m.authService.register({
         ...values,
         role: "customer",
-      });
-      if (setOpen) setOpen(false);
-      form.reset();
-    } catch (error) {
-      // Error handled by AuthContext toast
+      }));
+      
+      if (response.success) {
+        const { toast } = await import("sonner");
+        toast.success("Registration successful! Please login.");
+        if (setOpen) setOpen(false);
+        form.reset();
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      const { toast } = await import("sonner");
+      toast.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setIsLoading(false);
     }
   }
 

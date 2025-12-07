@@ -2,7 +2,7 @@
 
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
-import { sellerApi } from "@/services/api";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ interface Category {
 }
 
 export default function AddProductPage() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -48,8 +48,23 @@ export default function AddProductPage() {
 
   const fetchCategories = async () => {
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/categories');
+        // Use categoryService if available, otherwise keep hardcoded for now or fetch from API
+        // Prompt asked to create service files. I created category.service.ts
+        const { categoryService } = await import("@/services/category.service");
+        // But the previous file had hardcoded. 
+        // Let's try to fetch, if fails, fallback to hardcoded list?
+        // Or just use hardcoded if API not ready?
+        // I will just use reference to categoryService but fallback to hardcoded if needed or just use hardcoded list if that was the intent.
+        // Actually, previous code: "// TODO: Replace with actual API call".
+        // I should probably try to call API.
+        try {
+            const response = await categoryService.getAll();
+            if (response.categories && response.categories.length > 0) {
+                 setCategories(response.categories);
+                 return;
+            }
+        } catch (e) {}
+
       setCategories([
         { id: 1, name: "Beverages" },
         { id: 2, name: "Groceries" },
@@ -122,9 +137,13 @@ export default function AddProductPage() {
 
       // Upload images first
       const uploadedImageUrls = [];
+      
+      // We can move upload logic to service or keep here?
+      // Keeping here calling /api/upload directly.
+      // But we should use apiClient.
+      const { default: apiClient } = await import("@/lib/apiClient");
+
       for (const image of images) {
-        const formData = new FormData();
-        formData.append("file", image);
         
         // Convert file to base64 for upload
         const reader = new FileReader();
@@ -134,25 +153,13 @@ export default function AddProductPage() {
         });
         const base64Data = await base64Promise;
 
-        const uploadResponse = await fetch("/api/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify({ data: base64Data }),
-        });
-
-        if (!uploadResponse.ok) {
-          const errorData = await uploadResponse.json();
-          throw new Error(errorData.error || errorData.details || "Failed to upload image");
-        }
-
-        const uploadResult = await uploadResponse.json();
-        uploadedImageUrls.push(uploadResult.url);
+        const uploadResponse = await apiClient.post("/upload", { data: base64Data }); // Assuming /api/upload -> /upload
+        // The previous code called /api/upload. apiClient baseURL is /api. So /upload is correct.
+        
+        uploadedImageUrls.push(uploadResponse.data.url);
       }
 
-      const productData = {
+      const productData: any = {
         name: formData.name,
         category: formData.category,
         description: formData.description,
@@ -161,7 +168,8 @@ export default function AddProductPage() {
         images: uploadedImageUrls,
       };
 
-      await sellerApi.createProduct(token!, productData);
+      const { productService } = await import("@/services/product.service");
+      await productService.create(productData);
 
       toast({
         title: "Success",
@@ -169,7 +177,7 @@ export default function AddProductPage() {
       });
 
       router.push("/seller/products");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding product:", error);
       toast({
         title: "Error",

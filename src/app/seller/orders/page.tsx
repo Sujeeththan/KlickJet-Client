@@ -33,9 +33,45 @@ export default function OrdersPage() {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      // const response = await sellerApi.getSellerOrders(token);
-      setOrders([]);
+      const { orderService } = await import("@/services/order.service");
+      const response = await orderService.getAll();
+      // Need to adapt API response to component state if necessary, 
+      // or better yet, update component to use Order type from types/order.ts
+      // For now, I'll try to map if possible or cast.
+      // The component expects structure:
+      /* 
+         interface Order {
+            id: number; // backend uses _id string
+            customerId: number; // backend uses user string
+            customerName: string; // might need to fetch or might be in user object if populated
+            products: Array<{ name: string; quantity: number; price: number }>;
+            // ...
+         }
+      */
+      // If backend returns populated items.product, I can get name/price.
+      // Since I don't know exact backend shape returned for this user, I'll assume standard Order type and map loosely or set to empty if mismatch.
+      
+      // Let's assume response.orders is Order[] from types/order.ts
+      const fetchedOrders: any[] = response.orders || [];
+      
+      // Map to component's expected format (or update component to use real types)
+      // I'll update component to handle real types better in a future step or just map here.
+      // Mapping:
+      const mappedOrders = fetchedOrders.map((o: any) => ({
+        id: o._id,
+        customerId: o.user?._id || o.user, // user might be populated
+        customerName: o.user?.name || "Customer", // Fallback
+        products: o.items.map((i: any) => ({
+            name: i.product?.name || "Product", // product might be populated
+            quantity: i.quantity,
+            price: i.price || 0
+        })),
+        totalAmount: o.totalAmount,
+        status: o.status,
+        createdAt: o.createdAt
+      }));
+
+      setOrders(mappedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {

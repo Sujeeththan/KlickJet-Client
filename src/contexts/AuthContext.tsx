@@ -1,167 +1,114 @@
 "use client";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import Cookies from "js-cookie";
+import { authService } from "@/services/auth.service";
+import { User, LoginCredentials } from "@/types/user";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { authApi, ApiError } from '@/services/api';
-import { AuthContextType, User, LoginCredentials, RegisterData } from '@/types/auth';
-import { toast } from 'sonner';
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (token: string, userData: User) => Promise<void>;
+  logout: () => void;
+  isAuthenticated: boolean;
+  refreshUser: () => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = 'klickjet_token';
-const USER_KEY = 'klickjet_user';
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // Load user and token from localStorage on mount
-  useEffect(() => {
-    const loadAuth = async () => {
-      try {
-        const storedToken = localStorage.getItem(TOKEN_KEY);
-        const storedUser = localStorage.getItem(USER_KEY);
-
-        if (storedToken && storedUser) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
-          
-          // Verify token is still valid
-          try {
-            const response = await authApi.getMe(storedToken);
-            setUser(response.user);
-            localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-          } catch (error) {
-            // Token is invalid, clear auth
-            localStorage.removeItem(TOKEN_KEY);
-            localStorage.removeItem(USER_KEY);
-            setToken(null);
-            setUser(null);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading auth:', error);
-      } finally {
-        setIsLoading(false);
+  const refreshUser = async () => {
+    try {
+      const response = await authService.getCurrentUser();
+      setUser(response.user);
+    } catch (error: any) {
+      console.error("Failed to refresh user", error);
+      // If token is invalid, remove it
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        Cookies.remove("token");
+        setUser(null);
       }
-    };
+    }
+  };
 
-    loadAuth();
+  useEffect(() => {
+    // Check for token in cookies and load user
+    const token = Cookies.get("token");
+    if (token) {
+      // Fetch fresh user data from API
+      refreshUser().finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const login = useCallback(async (credentials: LoginCredentials) => {
+  const login = async (token: string, userData: User) => {
     try {
-      setIsLoading(true);
-      const response = await authApi.login(credentials);
-      
-      if (response.token) {
-        setToken(response.token);
-        setUser(response.user);
-        localStorage.setItem(TOKEN_KEY, response.token);
-        localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-        
-        toast.success(response.message || 'Login successful');
-        
-        // Redirect based on role
-        const redirectPath = getRoleRedirectPath(response.user.role);
-        router.push(redirectPath);
-      } else {
-        toast.error('Login failed: No token received');
-      }
-    } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(error.message);
-      } else {
-        toast.error('Login failed. Please try again.');
-      }
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router]);
+      // Store token first
+      Cookies.set("token", token, { expires: 7 }); // 7 days
 
-  const register = useCallback(async (data: RegisterData) => {
+      // Update user state
+      setUser(userData);
+
+      // Get redirect path based on role
+      const redirectPath = getRoleRedirectPath(userData.role);
+
+      // Use replace instead of push to avoid back button issues
+      // Use setTimeout to ensure state is updated before redirect
+      setTimeout(() => {
+        router.replace(redirectPath);
+      }, 100);
+    } catch (error) {
+      console.error("Login error", error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
     try {
-      setIsLoading(true);
-      const response = await authApi.register(data);
-      
-      // For sellers and deliverers, they need admin approval
-      if (data.role === 'seller' || data.role === 'deliverer') {
-        toast.success(response.message || 'Registration successful! Awaiting admin approval.');
-        router.push('/auth/login');
-      } else {
-        // For customers, auto-login
-        if (response.token) {
-          setToken(response.token);
-          setUser(response.user);
-          localStorage.setItem(TOKEN_KEY, response.token);
-          localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-          
-          toast.success(response.message || 'Registration successful');
-          
-          const redirectPath = getRoleRedirectPath(response.user.role);
-          router.push(redirectPath);
+      // Try to call logout API first (optional - invalidates token on server)
+      const token = Cookies.get("token");
+      if (token) {
+        try {
+          await authService.logout();
+        } catch (error) {
+          // Ignore logout API errors - still proceed with local logout
+          console.error("Logout API error (ignored):", error);
         }
       }
     } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(error.message);
-      } else {
-        toast.error('Registration failed. Please try again.');
-      }
-      throw error;
+      console.error("Logout error:", error);
     } finally {
-      setIsLoading(false);
-    }
-  }, [router]);
-
-  const logout = useCallback(async () => {
-    try {
-      setIsLoggingOut(true);
-      if (token) {
-        await authApi.logout(token);
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setToken(null);
+      // Always clear local state
+      Cookies.remove("token");
       setUser(null);
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
-      toast.success('Logged out successfully');
-      router.push('/');
-      // We don't reset isLoggingOut to false because we're navigating away
-      // and want to prevent ProtectedRoute from redirecting to login in the meantime
-    }
-  }, [token, router]);
+      toast.success("Logged out successfully");
 
-  const refreshUser = useCallback(async () => {
-    if (!token) return;
-    
-    try {
-      const response = await authApi.getMe(token);
-      setUser(response.user);
-      localStorage.setItem(USER_KEY, JSON.stringify(response.user));
-    } catch (error) {
-      console.error('Error refreshing user:', error);
-      // If refresh fails, logout
-      await logout();
+      // Redirect to landing page
+      setTimeout(() => {
+        router.replace("/");
+      }, 100);
     }
-  }, [token, logout]);
+  };
 
-  const value: AuthContextType = {
+  const value = {
     user,
-    token,
-    isLoading,
-    isAuthenticated: !!user && !!token,
+    loading,
     login,
-    register,
     logout,
+    isAuthenticated: !!user,
     refreshUser,
-    isLoggingOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -169,23 +116,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 }
 
 function getRoleRedirectPath(role: string): string {
   switch (role) {
-    case 'admin':
-      return '/admin';
-    case 'customer':
-      return '/customer';
-    case 'seller':
-      return '/seller';
-    case 'deliverer':
-      return '/deliverer';
+    case "admin":
+      return "/admin";
+    case "customer":
+      return "/customer";
+    case "seller":
+      return "/seller";
+    case "deliverer":
+      return "/deliverer";
     default:
-      return '/';
+      return "/";
   }
 }

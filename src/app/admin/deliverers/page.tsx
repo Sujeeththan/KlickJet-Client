@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { adminApi } from "@/services/api";
+import { userService } from "@/services/user.service";
+import { User } from "@/types/user";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,23 +35,13 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Trash2, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
-interface Deliverer {
-  _id: string;
-  name: string;
-  email: string;
-  phone_no: string;
-  address?: string;
-  vehicle_type?: string;
-  vehicle_no?: string;
-  status: string;
-  rejectionReason?: string;
-  createdAt: string;
-}
+// Use User type directly since the API returns User objects
+type Deliverer = User;
 
 const ITEMS_PER_PAGE = 10;
 
 export default function DeliverersPage() {
-  const { token } = useAuth();
+  // const { token } = useAuth();
   const [allDeliverers, setAllDeliverers] = useState<Deliverer[]>([]);
   const [filteredDeliverers, setFilteredDeliverers] = useState<Deliverer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,21 +57,17 @@ export default function DeliverersPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (token) {
-      fetchData();
-    }
-  }, [token]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     filterDeliverers();
   }, [allDeliverers, statusFilter]);
 
   const fetchData = async () => {
-    if (!token) return;
-
     setLoading(true);
     try {
-      const response = await adminApi.getAllDeliverers(token);
+      const response = await userService.getAllDeliverers();
       setAllDeliverers(response.deliverers || []);
     } catch (error: any) {
       toast.error(error.message || "Failed to fetch deliverers");
@@ -115,11 +102,11 @@ export default function DeliverersPage() {
   };
 
   const confirmApprove = async () => {
-    if (!selectedDeliverer || !token) return;
+    if (!selectedDeliverer) return;
 
     setActionLoading(selectedDeliverer._id);
     try {
-      await adminApi.approveDeliverer(token, selectedDeliverer._id);
+      await userService.approveDeliverer(selectedDeliverer._id);
       toast.success("Deliverer approved successfully");
       setApproveDialogOpen(false);
       setSelectedDeliverer(null);
@@ -132,7 +119,7 @@ export default function DeliverersPage() {
   };
 
   const confirmReject = async () => {
-    if (!selectedDeliverer || !token) return;
+    if (!selectedDeliverer) return;
 
     if (!rejectionReason.trim()) {
       toast.error("Please provide a rejection reason");
@@ -141,7 +128,7 @@ export default function DeliverersPage() {
 
     setActionLoading(selectedDeliverer._id);
     try {
-      await adminApi.rejectDeliverer(token, selectedDeliverer._id, rejectionReason);
+      await userService.rejectDeliverer(selectedDeliverer._id, rejectionReason);
       toast.success("Deliverer rejected successfully");
       setRejectDialogOpen(false);
       setSelectedDeliverer(null);
@@ -155,11 +142,11 @@ export default function DeliverersPage() {
   };
 
   const confirmDelete = async () => {
-    if (!selectedDeliverer || !token) return;
+    if (!selectedDeliverer) return;
 
     setActionLoading(selectedDeliverer._id);
     try {
-      await adminApi.deleteDeliverer(token, selectedDeliverer._id);
+      await userService.deleteDeliverer(selectedDeliverer._id);
       toast.success("Deliverer deleted successfully");
       setDeleteDialogOpen(false);
       setSelectedDeliverer(null);
@@ -171,7 +158,8 @@ export default function DeliverersPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status?: string) => {
+    if (!status) return <Badge>Unknown</Badge>;
     switch (status.toLowerCase()) {
       case "approved":
         return <Badge className="bg-green-500 hover:bg-green-600">Approved</Badge>;

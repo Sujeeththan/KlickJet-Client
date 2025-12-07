@@ -1,7 +1,13 @@
 import { AuthResponse, LoginCredentials, RegisterData } from "@/types/auth";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+// Ensure baseURL includes /api prefix if not already included
+const getBaseURL = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  // If URL doesn't end with /api, add it
+  return url.endsWith("/api") ? url : `${url}/api`;
+};
+
+const API_BASE_URL = getBaseURL();
 
 class ApiError extends Error {
   constructor(public message: string, public statusCode: number) {
@@ -31,7 +37,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export const authApi = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,7 +60,7 @@ export const authApi = {
 
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +84,7 @@ export const authApi = {
 
   async getMe(token: string): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +108,7 @@ export const authApi = {
 
   async logout(token: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,7 +140,7 @@ export const adminApi = {
   },
 
   async getAllSellers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/sellers`, {
+    const response = await fetch(`${API_BASE_URL}/admin/sellers`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; sellers: any[] }>(response);
@@ -142,7 +148,7 @@ export const adminApi = {
 
   async approveSeller(token: string, id: string) {
     const response = await fetch(
-      `${API_BASE_URL}/api/admin/sellers/${id}/approve`,
+      `${API_BASE_URL}/admin/sellers/${id}/approve`,
       {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
@@ -152,22 +158,19 @@ export const adminApi = {
   },
 
   async rejectSeller(token: string, id: string, rejectionReason: string) {
-    const response = await fetch(
-      `${API_BASE_URL}/api/admin/sellers/${id}/reject`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ rejectionReason }),
-      }
-    );
+    const response = await fetch(`${API_BASE_URL}/admin/sellers/${id}/reject`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ rejectionReason }),
+    });
     return handleResponse<{ success: boolean; message: string }>(response);
   },
 
   async deleteSeller(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/sellers/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/sellers/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -175,17 +178,14 @@ export const adminApi = {
   },
 
   async getPendingDeliverers(token: string) {
-    const response = await fetch(
-      `${API_BASE_URL}/api/admin/deliverers/pending`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`${API_BASE_URL}/admin/deliverers/pending`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return handleResponse<{ success: boolean; deliverers: any[] }>(response);
   },
 
   async getAllDeliverers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/deliverers`, {
+    const response = await fetch(`${API_BASE_URL}/admin/deliverers`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; deliverers: any[] }>(response);
@@ -193,7 +193,7 @@ export const adminApi = {
 
   async approveDeliverer(token: string, id: string) {
     const response = await fetch(
-      `${API_BASE_URL}/api/admin/deliverers/${id}/approve`,
+      `${API_BASE_URL}/admin/deliverers/${id}/approve`,
       {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
@@ -204,7 +204,7 @@ export const adminApi = {
 
   async rejectDeliverer(token: string, id: string, rejectionReason: string) {
     const response = await fetch(
-      `${API_BASE_URL}/api/admin/deliverers/${id}/reject`,
+      `${API_BASE_URL}/admin/deliverers/${id}/reject`,
       {
         method: "PUT",
         headers: {
@@ -218,7 +218,7 @@ export const adminApi = {
   },
 
   async deleteDeliverer(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/deliverers/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/deliverers/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -226,7 +226,7 @@ export const adminApi = {
   },
 
   async getAllUsers(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; users: any[]; count: number }>(
@@ -235,7 +235,7 @@ export const adminApi = {
   },
 
   async deleteUser(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/api/users/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -245,14 +245,14 @@ export const adminApi = {
 
 export const sellerApi = {
   async getSellerProducts(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/products`, {
+    const response = await fetch(`${API_BASE_URL}/products`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; products: any[] }>(response);
   },
 
   async createProduct(token: string, productData: any) {
-    const response = await fetch(`${API_BASE_URL}/api/products`, {
+    const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -280,7 +280,7 @@ export const sellerApi = {
   },
 
   async deleteProduct(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/products/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -295,14 +295,14 @@ export const sellerApi = {
   },
 
   async getOrderById(token: string, id: string) {
-    const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; order: any }>(response);
   },
 
   async updateOrderStatus(token: string, id: string, status: string) {
-    const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -314,7 +314,7 @@ export const sellerApi = {
   },
 
   async getDashboardStats(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/seller/stats`, {
+    const response = await fetch(`${API_BASE_URL}/seller/stats`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{
@@ -331,21 +331,21 @@ export const sellerApi = {
 
 export const categoriesApi = {
   async getCategories() {
-    const response = await fetch(`${API_BASE_URL}/api/categories`);
+    const response = await fetch(`${API_BASE_URL}/categories`);
     return handleResponse<{ success: boolean; categories: any[] }>(response);
   },
 };
 
 export const cartApi = {
   async getCart(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/cart`, {
+    const response = await fetch(`${API_BASE_URL}/cart`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return handleResponse<{ success: boolean; cart: any }>(response);
   },
 
   async addToCart(token: string, productId: string, quantity: number = 1) {
-    const response = await fetch(`${API_BASE_URL}/api/cart`, {
+    const response = await fetch(`${API_BASE_URL}/cart`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -359,7 +359,7 @@ export const cartApi = {
   },
 
   async updateCartItem(token: string, itemId: string, quantity: number) {
-    const response = await fetch(`${API_BASE_URL}/api/cart/${itemId}`, {
+    const response = await fetch(`${API_BASE_URL}/cart/${itemId}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -383,7 +383,7 @@ export const cartApi = {
   },
 
   async clearCart(token: string) {
-    const response = await fetch(`${API_BASE_URL}/api/cart`, {
+    const response = await fetch(`${API_BASE_URL}/cart`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

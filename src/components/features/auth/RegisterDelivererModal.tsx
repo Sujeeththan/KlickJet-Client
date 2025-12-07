@@ -60,7 +60,7 @@ const formSchema = z.object({
 
 export function RegisterDelivererModal() {
   const [open, setOpen] = useState(false);
-  const { register, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -76,14 +76,24 @@ export function RegisterDelivererModal() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await register({
+      setIsLoading(true);
+      const response = await import("@/services/auth.service").then(m => m.authService.register({
         ...values,
         role: "deliverer",
-      });
-      setOpen(false);
-      form.reset();
-    } catch (error) {
-      // Error handled by AuthContext toast
+      }));
+      
+      if (response.success) {
+        const { toast } = await import("sonner");
+        toast.success("Registration successful! Awaiting admin approval.");
+        setOpen(false);
+        form.reset();
+      }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      const { toast } = await import("sonner");
+      toast.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setIsLoading(false);
     }
   }
 

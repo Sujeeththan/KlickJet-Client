@@ -158,7 +158,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0) return null;
 
-  function onSubmit(data: CheckoutFormValues) {
+  async function onSubmit(data: CheckoutFormValues) {
     // Check if user is logged in
     if (!user) {
       toast.error("Please log in to place your order");
@@ -172,46 +172,70 @@ export default function CheckoutPage() {
       return;
     }
 
-    console.log("Order Data:", data);
-    
-    // Generate order ID
-    const orderId = `ORD-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`;
-    
-    // Format full address
-    const fullAddress = `${data.address}, ${data.city}, Sri Lanka`;
-    
-    // Prepare order data for track-order page
-    const orderData = {
-      orderId,
-      deliveryAddress: fullAddress,
-      items: items.map(item => ({
-        name: item.title,
-        quantity: item.quantity,
-        price: item.price,
-        image: item.image,
-      })),
-      subtotal,
-      deliveryFee,
-      tax,
-      total,
-      shippingDetails: {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        address: data.address,
-        city: data.city,
-        zipCode: data.zipCode,
-        phone: data.phone,
-      },
-      paymentMethod: data.paymentMethod,
-      timestamp: new Date().toISOString(),
-    };
-    
-    // Store order data in sessionStorage
-    sessionStorage.setItem("orderCompleted", "true");
-    sessionStorage.setItem("currentOrder", JSON.stringify(orderData));
-    console.log("Stored order data in sessionStorage:", orderData);
-    
-    router.push("/order-confirmed");
+    try {
+        const fullAddress = `${data.address}, ${data.city}, ${data.zipCode}, Sri Lanka`;
+        
+        const orderPayload = {
+            items: items.map(item => ({
+                product: item.id,
+                quantity: item.quantity,
+                price: item.price // Backend might verify price, but sending it for now
+                // Backend might expect 'productId' or 'product'. Interface said 'product'.
+            })),
+            shippingAddress: fullAddress,
+            // Add other fields if backend supports them (e.g. paymentMethod, contact info)
+            paymentMethod: data.paymentMethod,
+            totalAmount: total,
+            contactInfo: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                phone: data.phone
+            }
+        };
+
+        const { orderService } = await import("@/services/order.service");
+        const response = await orderService.create(orderPayload);
+
+        // Prepare order data for confirmation/tracking (using response id if available or fallback)
+        const orderId = response.order?._id || `ORD-${Date.now()}`; 
+        
+        const orderData = {
+            orderId,
+            deliveryAddress: fullAddress,
+            items: items.map(item => ({
+                name: item.title,
+                quantity: item.quantity,
+                price: item.price,
+                image: item.image,
+            })),
+            subtotal,
+            deliveryFee,
+            tax,
+            total,
+            shippingDetails: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                address: data.address,
+                city: data.city,
+                zipCode: data.zipCode,
+                phone: data.phone,
+            },
+            paymentMethod: data.paymentMethod,
+            timestamp: new Date().toISOString(),
+        };
+        
+        // Store order data in sessionStorage
+        sessionStorage.setItem("orderCompleted", "true");
+        sessionStorage.setItem("currentOrder", JSON.stringify(orderData));
+        
+        clearCart();
+        toast.success("Order placed successfully!");
+        router.push("/order-confirmed");
+
+    } catch (error: any) {
+        console.error("Order creation failed:", error);
+        toast.error(error.message || "Failed to place order");
+    }
   }
 
 
