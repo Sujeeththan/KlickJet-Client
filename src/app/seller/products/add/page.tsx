@@ -136,28 +136,11 @@ export default function AddProductPage() {
       setLoading(true);
 
       // Upload images first
-      const uploadedImageUrls = [];
+      // Upload images directly to Cloudinary
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
       
-      // We can move upload logic to service or keep here?
-      // Keeping here calling /api/upload directly.
-      // But we should use apiClient.
-      const { default: apiClient } = await import("@/lib/apiClient");
-
-      for (const image of images) {
-        
-        // Convert file to base64 for upload
-        const reader = new FileReader();
-        const base64Promise = new Promise((resolve) => {
-          reader.onload = () => resolve(reader.result);
-          reader.readAsDataURL(image);
-        });
-        const base64Data = await base64Promise;
-
-        const uploadResponse = await apiClient.post("/upload", { data: base64Data }); // Assuming /api/upload -> /upload
-        // The previous code called /api/upload. apiClient baseURL is /api. So /upload is correct.
-        
-        uploadedImageUrls.push(uploadResponse.data.url);
-      }
+      const uploadPromises = images.map((image) => uploadToCloudinary(image));
+      const uploadedImageUrls = await Promise.all(uploadPromises);
 
       const productData: any = {
         name: formData.name,

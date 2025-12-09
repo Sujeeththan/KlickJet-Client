@@ -3,7 +3,11 @@ import Cookies from "js-cookie";
 
 // Ensure baseURL includes /api prefix if not already included
 const getBaseURL = () => {
-  const url = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const url =
+    process.env.NEXT_PUBLIC_API_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://klickjet-api.vercel.app"
+      : "http://localhost:5000");
   // If URL doesn't end with /api, add it
   return url.endsWith("/api") ? url : `${url}/api`;
 };
