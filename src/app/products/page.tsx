@@ -108,17 +108,20 @@ function ProductList() {
         <div className="bg-gray-50 py-16">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-8 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-secondary leading-tight mb-4">
                 All products are available
                 <br />
                 your need product order
               </h1>
             </div>
-            <div className="md:w-1/2 relative h-64 w-full md:h-80 bg-gray-200 rounded-lg overflow-hidden">
-              {/* Placeholder for the hero image */}
-              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                Hero Image
-              </div>
+            <div className="md:w-1/2 relative h-64 w-full md:h-80 rounded-lg overflow-hidden">
+              <Image
+                src="/hero-products.jpg"
+                alt="Fresh groceries and cooking"
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
           </div>
         </div>
@@ -127,7 +130,7 @@ function ProductList() {
           {/* Sidebar Categories */}
           <div className="w-full md:w-64 flex-shrink-0">
             <h2 className="font-bold text-xl mb-6">Categories</h2>
-            <div className="space-y-2">
+            <div className="space-y-2 ">
               {categories.map((cat) => (
                 <button
                   key={cat}
