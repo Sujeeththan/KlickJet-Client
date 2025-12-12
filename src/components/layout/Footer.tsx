@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import Image from "next/image";
+import { Facebook, Instagram, Twitter, MapPin, Phone, Mail } from "lucide-react";
 
 // Custom TikTok icon since it's not in lucide-react (or use a placeholder)
 const TikTok = ({ className }: { className?: string }) => (
@@ -23,57 +24,25 @@ export function Footer() {
   return (
     <footer className="bg-surface-secondary pt-16 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {/* About Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {/* Left: Logo & Social Icons */}
           <div>
-            <h3 className="font-bold text-lg mb-4">About KlickJet</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+            <div className="mb-4">
+              <Image 
+                src="/logo.png" 
+                alt="KlickJet" 
+                width={140} 
+                height={40} 
+                className="" 
+              />
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-6">
               Your one-stop shop for the freshest groceries and household essentials.
               Quality products, unbeatable prices.
             </p>
-          </div>
-
-          {/* Help & Support */}
-          <div>
-            <h3 className="font-bold text-lg mb-4">Help & Support</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <Link href="#" className="hover:text-foreground">Contact Us</Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-foreground">FAQ</Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-foreground">Shipping</Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-foreground">Track Order</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Privacy */}
-          <div className="flex flex-col md:flex-row justify-between">
-            <div>
-              <h3 className="font-bold text-lg mb-4">Privacy</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>
-                  <Link href="#" className="hover:text-foreground">About Us</Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-foreground">Careers</Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-foreground">Press</Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-foreground">Terms of services</Link>
-                </li>
-              </ul>
-            </div>
-
+            
             {/* Social Icons */}
-            <div className="mt-8 md:mt-0 flex gap-4 self-end">
+            <div className="flex gap-4">
               <Link href="#" className="text-black hover:opacity-80">
                 <Instagram className="h-8 w-8" />
               </Link>
@@ -87,6 +56,63 @@ export function Footer() {
                 <Twitter className="h-8 w-8" />
               </Link>
             </div>
+          </div>
+
+          {/* Column 2: Quick Links */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link href="/" className="hover:text-foreground">Home</Link>
+              </li>
+              <li>
+                <Link href="/products" className="hover:text-foreground">Products</Link>
+              </li>
+              <li>
+                <Link href="/auth/register/seller" className="hover:text-foreground">Become a Seller</Link>
+              </li>
+              <li>
+                <Link href="/auth/register/deliverer" className="hover:text-foreground">Join as Deliverer</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Help & Support */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Help & Support</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link href="#" className="hover:text-foreground">FAQ</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-foreground">Shipping</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-foreground">Track Order</Link>
+              </li>
+              <li>
+                <Link href="#" className="hover:text-foreground">Privacy Policy</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact Us */}
+          <div>
+            <h3 className="font-bold text-lg mb-4">Contact Us</h3>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3 text-sm text-muted-foreground">
+                <MapPin className="h-5 w-5 shrink-0 mt-0.5" />
+                <span>123 Commerce Street, Business City, BC 12345</span>
+              </li>
+              <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Phone className="h-5 w-5 shrink-0" />
+                <span>+1 (234) 567-890</span>
+              </li>
+              <li className="flex items-center gap-3 text-sm text-muted-foreground">
+                <Mail className="h-5 w-5 shrink-0" />
+                <span>support@onlinestore.com</span>
+              </li>
+            </ul>
           </div>
         </div>
 
