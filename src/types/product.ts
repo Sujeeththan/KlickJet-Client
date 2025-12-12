@@ -10,6 +10,7 @@ export interface Product {
     stock: number;
     instock: number; // Alias for stock, used by seller pages
     seller: string | { _id: string; name: string; shopName?: string }; // Can be string ID or populated object
+    seller_id?: string | { _id: string; name: string; shopName?: string }; // Populated by backend
     isActive: boolean;
     createdAt?: string;
     updatedAt?: string;

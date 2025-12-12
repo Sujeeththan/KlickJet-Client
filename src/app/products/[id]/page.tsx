@@ -79,7 +79,11 @@ export default function ProductDetailsPage() {
 
   // Get seller name from populated seller_id or use seller field
   const sellerName =
-    typeof product.seller === "object" && product.seller?.shopName
+    typeof product.seller_id === "object" && product.seller_id?.shopName
+      ? product.seller_id.shopName
+      : typeof product.seller_id === "object" && product.seller_id?.name
+      ? product.seller_id.name
+      : typeof product.seller === "object" && product.seller?.shopName
       ? product.seller.shopName
       : typeof product.seller === "object" && product.seller?.name
       ? product.seller.name
