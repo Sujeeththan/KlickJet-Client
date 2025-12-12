@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -10,6 +11,8 @@ export function Header() {
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const isProductsPage = pathname === "/products";
 
   useEffect(() => {
     setMounted(true);
@@ -34,10 +37,10 @@ export function Header() {
         {/* Navigation */}
         <nav className="flex items-center gap-6">
           <Link 
-            href="/" 
+            href={isProductsPage ? "/" : "/products"} 
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Shops
+            {isProductsPage ? "Shops" : "All Products"}
           </Link>
           {(!user || user.role === "customer") && (
             <Link 

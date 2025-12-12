@@ -57,6 +57,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 price: item.price,
                 quantity: item.quantity,
                 image: item.image,
+                seller:
+                  item.product.seller_id?.shopName ||
+                  item.product.seller_id?.name ||
+                  "Unknown Shop",
               }));
             setItems(transformedItems);
           }
@@ -110,6 +114,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
             price: item.price,
             quantity: item.quantity,
             image: item.image,
+            seller:
+              item.product.seller_id?.shopName ||
+              item.product.seller_id?.name ||
+              "Unknown Shop",
           }));
         setItems(transformedItems);
       }

@@ -203,11 +203,18 @@ export default function CartPage() {
                   </span>
                 </div>
 
-                <Link href="/checkout/shipping">
-                  <Button className="w-full bg-gray-900 text-white hover:bg-gray-800 h-11 text-base font-semibold">
-                    Proceed to Checkout
-                  </Button>
-                </Link>
+                <Button 
+                  className="w-full bg-gray-900 text-white hover:bg-gray-800 h-11 text-base font-semibold"
+                  onClick={() => {
+                    if (user) {
+                      router.push("/checkout/shipping");
+                    } else {
+                      router.push("/auth/login");
+                    }
+                  }}
+                >
+                  Proceed to Checkout
+                </Button>
               </CardContent>
             </Card>
           </div>
