@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2, ShoppingBasket, Facebook } from "lucide-react";
+import { Loader2, ShoppingBasket, Facebook, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -122,7 +122,15 @@ export default function LoginPage() {
       {/* Centered Popup Card */}
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden h-[600px]">
         {/* Left Side - Login Form */}
-        <div className="p-8 md:p-12 flex flex-col justify-center h-full overflow-y-auto">
+        <div className="relative p-8 md:p-12 flex flex-col justify-center h-full overflow-y-auto">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 left-4 text-gray-500 hover:text-gray-900"
+            onClick={() => router.back()}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <div className="w-full max-w-sm mx-auto space-y-6">
             <div className="text-center">
               <h2 className="text-2xl font-bold tracking-tight text-gray-900">
