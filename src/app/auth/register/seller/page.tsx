@@ -130,7 +130,7 @@ export default function RegisterSellerPage() {
                     <FormItem>
                       <FormLabel className="font-medium">Shop Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="My Awesome Shop" {...field} className="rounded-lg h-10" />
+                        <Input placeholder="Enter Your Shop Name" {...field} className="rounded-lg h-10" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -143,7 +143,7 @@ export default function RegisterSellerPage() {
                     <FormItem>
                       <FormLabel className="font-medium">Owner Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} className="rounded-lg h-10" />
+                        <Input placeholder="Enter Owner Name" {...field} className="rounded-lg h-10" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -157,7 +157,7 @@ export default function RegisterSellerPage() {
                       <FormItem>
                         <FormLabel className="font-medium">Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="shop@example.com" {...field} className="rounded-lg h-10" />
+                          <Input placeholder="Enter Your Email" {...field} className="rounded-lg h-10" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -197,7 +197,7 @@ export default function RegisterSellerPage() {
                     <FormItem>
                       <FormLabel className="font-medium">Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="******" {...field} className="rounded-lg h-10" />
+                        <Input type="password" placeholder="Enter Your Password" {...field} className="rounded-lg h-10" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
