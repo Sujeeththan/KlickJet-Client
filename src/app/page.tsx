@@ -187,7 +187,7 @@ export default function IntroPage() {
                 <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
               </div>
             ) : displayShops.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {displayShops.map((shop) => {
                   const addressParts = shop.address?.split(",") || [];
                   const shopLocation =

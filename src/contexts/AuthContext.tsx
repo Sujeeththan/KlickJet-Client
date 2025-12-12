@@ -33,11 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await authService.getCurrentUser();
       setUser(response.user);
     } catch (error: any) {
-      console.error("Failed to refresh user", error);
-      // If token is invalid, remove it
+      // If token is invalid, remove it gracefully without alarming error
       if (error.response?.status === 401 || error.response?.status === 403) {
-        Cookies.remove("token");
+        console.warn("Session expired or invalid, logging out...");
+        Cookies.remove("token", { path: '/' });
         setUser(null);
+      } else {
+        console.error("Failed to refresh user", error);
       }
     }
   };
@@ -91,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Logout error:", error);
     } finally {
       // Always clear local state
-      Cookies.remove("token");
+      Cookies.remove("token", { path: '/' });
       setUser(null);
       toast.success("Logged out successfully");
 
