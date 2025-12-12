@@ -166,6 +166,19 @@ function ProductList() {
               >
                 Search
               </Button>
+              {(searchQuery || categoryFilter !== "All products") && (
+                <Button
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearchQuery("");
+                    setCategoryFilter("All products");
+                  }}
+                  variant="outline"
+                  className="px-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                  Clear
+                </Button>
+              )}
             </div>
 
             {/* Product Grid */}

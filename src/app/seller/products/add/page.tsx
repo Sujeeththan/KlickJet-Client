@@ -2,7 +2,6 @@
 
 import { ProtectedRoute } from "@/features/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +16,11 @@ import {
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { categoryService } from "@/services/category.service"; // Assumed standard import
+import { productService } from "@/services/product.service";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 interface Category {
   id: number;
@@ -33,13 +35,14 @@ export default function AddProductPage() {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  
+
+  // Using 'instock' to align with backend, but UI label can be 'Stock'
   const [formData, setFormData] = useState({
     name: "",
     category: "",
     description: "",
     price: "",
-    stock: "",
+    instock: "",
   });
 
   useEffect(() => {
@@ -48,22 +51,16 @@ export default function AddProductPage() {
 
   const fetchCategories = async () => {
     try {
-        // Use categoryService if available, otherwise keep hardcoded for now or fetch from API
-        // Prompt asked to create service files. I created category.service.ts
-        const { categoryService } = await import("@/services/category.service");
-        // But the previous file had hardcoded. 
-        // Let's try to fetch, if fails, fallback to hardcoded list?
-        // Or just use hardcoded if API not ready?
-        // I will just use reference to categoryService but fallback to hardcoded if needed or just use hardcoded list if that was the intent.
-        // Actually, previous code: "// TODO: Replace with actual API call".
-        // I should probably try to call API.
-        try {
-            const response = await categoryService.getAll();
-            if (response.categories && response.categories.length > 0) {
-                 setCategories(response.categories);
-                 return;
-            }
-        } catch (e) {}
+      // Try to fetch from API, fallback to hardcoded if necessary
+      try {
+        const response = await categoryService.getAll();
+        if (response.categories && response.categories.length > 0) {
+          setCategories(response.categories);
+          return;
+        }
+      } catch (e) {
+        console.warn("Failed to fetch categories from API, using fallback.");
+      }
 
       setCategories([
         { id: 1, name: "Beverages" },
@@ -94,7 +91,7 @@ export default function AddProductPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     if (images.length + files.length > 5) {
       toast({
         title: "Too many images",
@@ -123,7 +120,7 @@ export default function AddProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.category || !formData.price || !formData.stock) {
+    if (!formData.name || !formData.category || !formData.price || !formData.instock) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields",
@@ -135,23 +132,22 @@ export default function AddProductPage() {
     try {
       setLoading(true);
 
-      // Upload images first
-      // Upload images directly to Cloudinary
-      const { uploadToCloudinary } = await import("@/lib/cloudinary");
-      
-      const uploadPromises = images.map((image) => uploadToCloudinary(image));
-      const uploadedImageUrls = await Promise.all(uploadPromises);
+      // Upload images to Cloudinary
+      let uploadedImageUrls: string[] = [];
+      if (images.length > 0) {
+        const uploadPromises = images.map((image) => uploadToCloudinary(image));
+        uploadedImageUrls = await Promise.all(uploadPromises);
+      }
 
-      const productData: any = {
+      const productData = {
         name: formData.name,
         category: formData.category,
         description: formData.description,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.stock),
+        instock: parseInt(formData.instock), // Map to instock as per backend schema (Number)
         images: uploadedImageUrls,
       };
 
-      const { productService } = await import("@/services/product.service");
       await productService.create(productData);
 
       toast({
@@ -164,7 +160,7 @@ export default function AddProductPage() {
       console.error("Error adding product:", error);
       toast({
         title: "Error",
-        description: "Failed to add product. Please try again.",
+        description: error.message || "Failed to add product. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -195,7 +191,7 @@ export default function AddProductPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Product Name</Label>
+                  <Label htmlFor="name">Product Name *</Label>
                   <Input
                     id="name"
                     name="name"
@@ -246,7 +242,7 @@ export default function AddProductPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price</Label>
+                  <Label htmlFor="price">Price *</Label>
                   <Input
                     id="price"
                     name="price"
@@ -261,13 +257,13 @@ export default function AddProductPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="stock">Stock</Label>
+                  <Label htmlFor="instock">Stock *</Label>
                   <Input
-                    id="stock"
-                    name="stock"
+                    id="instock"
+                    name="instock" // Binding to instock
                     type="number"
                     min="0"
-                    value={formData.stock}
+                    value={formData.instock}
                     onChange={handleInputChange}
                     placeholder="0"
                     required
@@ -301,7 +297,7 @@ export default function AddProductPage() {
                           : "Choose Files"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        No file chosen
+                        Click to select images
                       </p>
                     </label>
                   </div>
@@ -337,7 +333,14 @@ export default function AddProductPage() {
 
               <div className="flex gap-4">
                 <Button type="submit" disabled={loading} className="flex-1">
-                  {loading ? "Adding Product..." : "Add Product"}
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Adding Product...
+                    </>
+                  ) : (
+                    "Add Product"
+                  )}
                 </Button>
                 <Button
                   type="button"

@@ -20,8 +20,8 @@ export interface CreateProductData {
     description: string;
     price: number;
     category: string;
-    image?: string; // Logic for upload might be separate
-    stock: number;
+    images: string[];
+    instock: number;
 }
 
 export interface UpdateProductData extends Partial<CreateProductData> {}

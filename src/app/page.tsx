@@ -123,6 +123,15 @@ export default function IntroPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                {selectedLocation !== "all" && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedLocation("all")}
+                    className="h-12 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                  >
+                    Clear
+                  </Button>
+                )}
               </div>
               <p className="text-sm text-muted-foreground/70">
                 Select your area to see nearby shops

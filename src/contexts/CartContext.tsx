@@ -48,14 +48,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
           const response = await cartService.getCart();
           if (response.success && response.cart) {
             // Transform backend cart items to frontend format
-            const transformedItems = response.cart.items.map((item: any) => ({
-              _id: item._id,
-              id: item.product._id || item.product,
-              title: item.title,
-              price: item.price,
-              quantity: item.quantity,
-              image: item.image,
-            }));
+            const transformedItems = response.cart.items
+              .filter((item: any) => item && item.product) // Filter out items with missing products
+              .map((item: any) => ({
+                _id: item._id,
+                id: item.product._id || item.product,
+                title: item.title,
+                price: item.price,
+                quantity: item.quantity,
+                image: item.image,
+              }));
             setItems(transformedItems);
           }
         } catch (error) {
@@ -99,14 +101,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const response = await cartService.getCart();
       if (response.success && response.cart) {
-        const transformedItems = response.cart.items.map((item: any) => ({
-          _id: item._id,
-          id: item.product._id || item.product,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-          image: item.image,
-        }));
+        const transformedItems = response.cart.items
+          .filter((item: any) => item && item.product) // Filter out items with missing products
+          .map((item: any) => ({
+            _id: item._id,
+            id: item.product._id || item.product,
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+          }));
         setItems(transformedItems);
       }
     } catch (error) {
