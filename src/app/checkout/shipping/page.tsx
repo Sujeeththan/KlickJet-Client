@@ -25,6 +25,20 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const DISTRICTS = [
+  "Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha",
+  "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala",
+  "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya",
+  "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"
+];
 
 // --------------------
 // Zod Schema
@@ -47,11 +61,9 @@ const shippingSchema = z.object({
     .trim()
     .min(5, "Address is required and must be at least 5 characters"),
 
-  city: z
+  district: z
     .string()
-    .trim()
-    .min(2, "City is required and must be at least 2 characters")
-    .regex(/^[A-Za-z ]+$/, "City can only contain letters and spaces"),
+    .min(1, "Please select a district"),
 
   zipCode: z
     .string()
@@ -89,7 +101,7 @@ export default function ShippingAddressPage() {
       firstName: "",
       lastName: "",
       address: "",
-      city: "",
+      district: "",
       zipCode: "",
       phone: "",
     },
@@ -248,7 +260,7 @@ export default function ShippingAddressPage() {
                           <FormItem>
                             <FormLabel>First Name *</FormLabel>
                             <FormControl>
-                              <Input placeholder="John" {...field} />
+                              <Input placeholder="Enter Your First Name" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -261,7 +273,7 @@ export default function ShippingAddressPage() {
                           <FormItem>
                             <FormLabel>Last Name *</FormLabel>
                             <FormControl>
-                              <Input placeholder="Doe" {...field} />
+                              <Input placeholder="Enter Your Last Name" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -290,7 +302,7 @@ export default function ShippingAddressPage() {
                         <FormItem>
                           <FormLabel>Street Address *</FormLabel>
                           <FormControl>
-                            <Input placeholder="123 Main Street" {...field} />
+                            <Input placeholder="Enter Your Address" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -300,13 +312,24 @@ export default function ShippingAddressPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
-                        name="city"
+                        name="district"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>City *</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Colombo" {...field} />
-                            </FormControl>
+                            <FormLabel>District *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select District" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {DISTRICTS.map((district) => (
+                                  <SelectItem key={district} value={district}>
+                                    {district}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
