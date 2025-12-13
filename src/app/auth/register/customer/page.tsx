@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -50,7 +50,7 @@ const formSchema = z.object({
     ),
 });
 
-export default function RegisterCustomerPage() {
+function RegisterCustomerContent() {
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -213,5 +213,17 @@ export default function RegisterCustomerPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterCustomerPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <RegisterCustomerContent />
+    </Suspense>
   );
 }
