@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
@@ -34,7 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             {children}
-            <Toaster position="bottom-right" richColors />
+            <Toaster position="top-center" richColors />
             <ShadcnToaster />
           </CartProvider>
         </AuthProvider>

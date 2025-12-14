@@ -16,13 +16,66 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 import Link from "next/link";
+import { VoiceSearch, VoiceCommand } from "@/components/features/voice/VoiceSearch";
+import { useCart } from "@/contexts/CartContext";
 
 function ProductList() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const sellerIdFilter = searchParams.get("seller_id");
 
+  const { addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
+
+  const handleVoiceCommand = (command: VoiceCommand) => {
+    if (command.action === "search") {
+      setSearchInput(command.productName);
+      setSearchQuery(command.productName);
+      toast.info(`Searching for: ${command.productName}`);
+    } else if (command.action === "add") {
+       // Find product (fuzzy match)
+       const query = command.productName.toLowerCase();
+       // Prioritize exact matches or start matches
+       const targetProduct = products.find(p => p.name.toLowerCase().includes(query));
+       
+       if (targetProduct) {
+           // Logic to extract seller ID (reused from ProductCard logic safely)
+          const sellerId =
+            typeof targetProduct.seller_id === "object" && targetProduct.seller_id?._id
+              ? targetProduct.seller_id._id
+              : typeof targetProduct.seller_id === "string"
+              ? targetProduct.seller_id
+              : typeof targetProduct.seller === "object" && targetProduct.seller?._id
+              ? targetProduct.seller._id
+              : typeof targetProduct.seller === "string"
+              ? targetProduct.seller
+              : undefined;
+
+           const mainImage =
+            targetProduct.images && targetProduct.images.length > 0
+              ? targetProduct.images[targetProduct.mainImageIndex || 0]
+              : targetProduct.image || "/placeholder.png";
+
+           addToCart({
+             id: targetProduct._id,
+             title: targetProduct.name,
+             price: targetProduct.price,
+             sellerId: sellerId,
+             image: mainImage
+           }, command.quantity);
+           
+           toast.success(`Voice Assistant: Added ${command.quantity} ${targetProduct.name} to cart`);
+       } else {
+         const message = "Sorry, the requested product is currently unavailable.";
+         toast.error(message);
+         
+         if (typeof window !== "undefined" && "speechSynthesis" in window) {
+           const utterance = new SpeechSynthesisUtterance(message);
+           window.speechSynthesis.speak(utterance);
+         }
+       }
+    }
+  };
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -174,6 +227,7 @@ function ProductList() {
                 />
               </div>
               <div className="flex gap-4">
+                <VoiceSearch onCommand={handleVoiceCommand} />
                 <Button
                   onClick={handleSearchClick}
                   className="flex-1 sm:flex-none text-white px-8"
