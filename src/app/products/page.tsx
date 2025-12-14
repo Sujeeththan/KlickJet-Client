@@ -147,8 +147,8 @@ function ProductList() {
                   onClick={() => setCategoryFilter(cat)}
                   className={`block w-full text-left px-4 py-2 rounded-md transition-colors ${
                     categoryFilter === cat
-                      ? "bg-gray-200 font-medium"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "text-gray-600 hover:bg-primary/10 hover:text-primary"
                   }`}
                 >
                   {cat}
@@ -280,13 +280,7 @@ function ProductList() {
               </div>
             )}
 
-            {/* Bottom Images Grid (as seen in design usually) */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-16">
-              <div className="h-40 bg-gray-100 rounded-lg"></div>
-              <div className="h-40 bg-gray-100 rounded-lg"></div>
-              <div className="h-40 bg-gray-100 rounded-lg"></div>
-              <div className="h-40 bg-gray-100 rounded-lg"></div>
-            </div>
+           
           </div>
         </div>
       </main>
