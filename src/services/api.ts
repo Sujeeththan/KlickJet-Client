@@ -125,13 +125,13 @@ export const adminService = {
     return response.data;
   },
 
-  getApprovedSellers: async () => {
+  getApprovedSellers: async (params: { limit?: number } = { limit: 100 }) => {
     const response = await apiClient.get<{
       success: boolean;
       sellers: any[];
       count: number;
       total: number;
-    }>("/sellers/public/approved");
+    }>("/sellers/public/approved", { params });
     return response.data;
   },
 };
