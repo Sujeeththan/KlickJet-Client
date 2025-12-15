@@ -110,7 +110,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3 text-sm text-muted-foreground">
                 <Mail className="h-5 w-5 shrink-0" />
-                <span>support@onlinestore.com</span>
+                <span>support@KlickJet.com</span>
               </li>
             </ul>
           </div>
