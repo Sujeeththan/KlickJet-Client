@@ -34,7 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             {children}
-            <Toaster position="top-center" richColors />
+            <Toaster position="bottom-right" richColors />
             <ShadcnToaster />
           </CartProvider>
         </AuthProvider>
