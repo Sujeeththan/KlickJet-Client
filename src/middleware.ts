@@ -6,10 +6,10 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Define public routes
-  const publicRoutes = ["/", "/auth/login", "/auth/register", "/auth/forgot-password"];
+  const publicRoutes = ["/auth/login", "/auth/register", "/auth/forgot-password"];
   
   // Allow public routes and static assets
-  if (publicRoutes.some((route) => pathname.startsWith(route)) || pathname.includes(".")) {
+  if (pathname === "/" || publicRoutes.some((route) => pathname.startsWith(route)) || pathname.includes(".")) {
     return NextResponse.next();
   }
 
